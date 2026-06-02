@@ -23,7 +23,7 @@ Nine category subagents scan the codebase, report what's derivable versus missin
 
 Sample output: [Markdown](build-architecture-communication-canvas/example-architecture-communication-canvas.md) · [HTML](build-architecture-communication-canvas/example-architecture-communication-canvas.html)
 
-[![Architecture Communication Canvas - HTML overview for the sample Taskflow API](build-architecture-communication-canvas/example-architecture-communication-canvas.png)](build-architecture-communication-canvas/example-architecture-communication-canvas.html)
+[![Architecture Communication Canvas - HTML overview for the sample Taskflow API](build-architecture-communication-canvas/example-architecture-communication-canvas.png)](build-architecture-communication-canvas/example-architecture-communication-canvas.png)
 
 ### 2. `/discover-ubiquitous-language`
 
@@ -41,7 +41,7 @@ It scans the code black-box and, where available, folds in the outputs of the tw
 
 Sample output: index [Markdown](define-bounded-contexts/example-bounded-contexts.md) · per-context canvas [Markdown](define-bounded-contexts/example-bounded-contexts/sales.md) · [HTML](define-bounded-contexts/example-bounded-contexts/sales.html) (also [billing](define-bounded-contexts/example-bounded-contexts/billing.html), [delivery](define-bounded-contexts/example-bounded-contexts/delivery.html), [identity](define-bounded-contexts/example-bounded-contexts/identity.html))
 
-[![Bounded Context Canvas - Sales (sample HTML overview)](define-bounded-contexts/example-bounded-contexts/sales.png)](define-bounded-contexts/example-bounded-contexts/sales.html)
+[![Bounded Context Canvas - Sales (sample HTML overview)](define-bounded-contexts/example-bounded-contexts/sales.png)](define-bounded-contexts/example-bounded-contexts/sales.png)
 
 More tools (e.g. architecture review) will follow as additional top-level folders.
 
