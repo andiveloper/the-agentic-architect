@@ -1,8 +1,12 @@
 # The Last Architect
 
-Fill out the [arc42 Architecture Communication Canvas (ACC)](https://canvas.arc42.org/architecture-communication-canvas) for **any** repository, straight from Cursor.
+**The Last Architect** equips coding agents with reusable guidance for architectural work - so your agent ([Cursor](https://cursor.com/docs) or [Claude Code](https://code.claude.com/docs)) can genuinely assist software and solution architects and development teams, not just write code. It is a growing toolbelt of skills and subagents, each focused on one architecture task and installable on its own.
 
-The Last Architect is a Cursor toolkit (one orchestrator skill, nine category subagents, and a few shared knowledge skills) that analyzes a codebase as a **black box** - no assumptions about language, framework, or layout - and produces a single, evidence-backed Markdown file with all nine ACC sections filled in.
+## Tools on the belt
+
+- **build-architecture-communication-canvas** *(first tool)* - fill out the [arc42 Architecture Communication Canvas (ACC)](https://canvas.arc42.org/architecture-communication-canvas) for **any** repository, straight from your coding agent. It analyzes a codebase as a **black box** - no assumptions about language, framework, or layout - and produces a single, evidence-backed Markdown file with all nine ACC sections filled in. See a [sample canvas](build-architecture-communication-canvas/example-architecture-communication-canvas.md) for what the output looks like.
+
+More tools (e.g. architecture review) will follow as additional top-level folders. The rest of this README covers the first tool, **build-architecture-communication-canvas**.
 
 ## What is the Architecture Communication Canvas?
 
@@ -37,8 +41,8 @@ flowchart LR
 
 ### Why subagents + skills?
 
-- **Subagents** ([docs](https://cursor.com/docs/subagents)) give each category its own context window, so the noisy repo scanning never bloats the main conversation. One subagent per category keeps the work transparent and independently improvable.
-- **Skills** ([docs](https://cursor.com/docs/skills)) carry the reusable knowledge (canvas template, discovery heuristics, question bank) and load progressively. The entrypoint is a skill with `disable-model-invocation: true`, so it installs via the skills standard but is still invoked as `/build-architecture-communication-canvas`.
+- **Subagents** (Cursor [docs](https://cursor.com/docs/subagents) / Claude Code [docs](https://code.claude.com/docs/en/sub-agents)) give each category its own context window, so the noisy repo scanning never bloats the main conversation. One subagent per category keeps the work transparent and independently improvable.
+- **Skills** (Cursor [docs](https://cursor.com/docs/skills) / Claude Code [docs](https://code.claude.com/docs/en/skills)) carry the reusable knowledge (canvas template, discovery heuristics, question bank) and load progressively. The entrypoint is a skill with `disable-model-invocation: true`, so it installs via the skills standard but is still invoked as `/build-architecture-communication-canvas`.
 
 ## Black-box guarantee
 
@@ -50,51 +54,67 @@ The analysis makes **zero assumptions** about the repo:
 
 ## Install
 
-### Option A - install script (recommended; installs skills + subagents)
+The `install.sh` script copies the toolkit's skills and subagents into the right place for your coding agent. Pick one or more agents (`--cursor`, `--claude`) and exactly one scope (`--user` for all your projects, `--target <dir>` for a single project).
+
+### Option A - run directly from GitHub (no checkout needed)
 
 ```bash
-git clone https://github.com/<your-org>/the-last-architect.git
-cd the-last-architect
+# Cursor, user-scoped (all your projects):
+curl -fsSL https://raw.githubusercontent.com/andiveloper/the-last-architect/main/install.sh | bash -s -- --cursor --user
 
-# Into another project (project-scoped):
-./install.sh --target /path/to/your/project
-
-# Or for all your projects (user-scoped):
-./install.sh --user
+# Claude Code, into a specific project:
+curl -fsSL https://raw.githubusercontent.com/andiveloper/the-last-architect/main/install.sh | bash -s -- --claude --target /path/to/your/project
 ```
 
-The script copies `.cursor/skills/` and `.cursor/agents/` into the destination. Run `./install.sh --help` for options.
+### Option B - from a local checkout
 
-### Option B - GitHub remote rule (skills only)
+```bash
+git clone https://github.com/andiveloper/the-last-architect.git
+cd the-last-architect
 
-In Cursor: **Settings -> Rules -> Project Rules -> Add Rule -> Remote Rule (GitHub)** and enter this repo's URL. This imports the skills; subagents in `.cursor/agents/` are not covered by the GitHub import flow, so use Option A if you want the per-category subagents too.
+# Cursor + Claude Code into another project (project-scoped):
+./install.sh --cursor --claude --target /path/to/your/project
+
+# Or user-scoped (all your projects):
+./install.sh --cursor --user
+```
+
+Per agent, the script installs into:
+
+| Agent | Flag | Skills | Subagents |
+| --- | --- | --- | --- |
+| Cursor | `--cursor` | `<base>/.cursor/skills/` | `<base>/.cursor/agents/` |
+| Claude Code | `--claude` | `<base>/.claude/skills/` | `<base>/.claude/agents/` |
+
+where `<base>` is `$HOME` (`--user`) or your `--target` directory. Run `./install.sh --help` for all options.
 
 ## Usage
 
-1. Open the repository you want to document in Cursor.
+1. Open the repository you want to document in your coding agent (Cursor or Claude Code).
 2. Run `/build-architecture-communication-canvas`.
 3. Answer the Missing Inputs Report (add docs or answer questions, or skip).
 4. Review `docs/architecture-communication-canvas.md` and resolve any `TODO (human input needed)` placeholders.
 
 ## What's in this repo
 
+The toolkit is agent-neutral: source files live in a single top-level folder and `install.sh` maps them into each coding agent's directories. Future toolkits (e.g. `architecture-review/`) will be added as sibling top-level folders.
+
 ```
-.cursor/
+build-architecture-communication-canvas/         # the ACC tool (first on the belt)
   skills/
-    build-architecture-communication-canvas/   # orchestrator entrypoint
-    arc42-acc-canvas/                           # canvas template + conventions
-    repo-discovery/                             # black-box discovery heuristics
-    acc-gap-analysis/                           # inputs catalog + question bank
+    build-architecture-communication-canvas/      # orchestrator entrypoint
+    arc42-acc-canvas/                              # canvas template + conventions
+    repo-discovery/                                # black-box discovery heuristics
+    acc-gap-analysis/                              # inputs catalog + question bank
   agents/
     acc-value-proposition.md ... acc-risks-missing-info.md   # 9 category subagents
-docs/
-  example-architecture-communication-canvas.md  # sample output
+  example-architecture-communication-canvas.md    # sample output
 install.sh
 ```
 
 ## Example output
 
-See [docs/example-architecture-communication-canvas.md](docs/example-architecture-communication-canvas.md) for a filled-in sample.
+See [build-architecture-communication-canvas/example-architecture-communication-canvas.md](build-architecture-communication-canvas/example-architecture-communication-canvas.md) for a filled-in sample.
 
 ## License
 
