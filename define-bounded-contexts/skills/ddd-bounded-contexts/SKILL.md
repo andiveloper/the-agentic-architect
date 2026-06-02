@@ -1,12 +1,12 @@
 ---
 name: ddd-bounded-contexts
-description: Domain-Driven Design strategic-design heuristics for identifying bounded contexts and the context map of a codebase - what a bounded context is, the signals that reveal boundaries, how to use ubiquitous-language and ACC inputs, the context-map relationship patterns (Shared Kernel, Customer/Supplier, Conformist, ACL, Open Host Service, Published Language, Partnership, Separate Ways), and the per-context fragment format. Use when discovering, analyzing, or assembling bounded contexts from a repository.
+description: Domain-Driven Design strategic-design heuristics for identifying bounded contexts and the context map of a codebase, and for filling out a Bounded Context Canvas per context - what a bounded context is, the signals that reveal boundaries, how to use ubiquitous-language and ACC inputs, the context-map relationship patterns (Shared Kernel, Customer/Supplier, Conformist, ACL, Open Host Service, Published Language, Partnership, Separate Ways), the Bounded Context Canvas fields (ddd-crew), and the per-context canvas fragment format. Use when discovering, analyzing, or assembling bounded contexts from a repository.
 disable-model-invocation: true
 ---
 
 # DDD bounded contexts
 
-Reusable knowledge for identifying [bounded contexts](https://martinfowler.com/bliki/BoundedContext.html) and the [context map](https://martinfowler.com/bliki/BoundedContext.html) - the strategic design - **as it appears in an existing codebase**. The output is meant to be reviewed and refined with architects and teams. Discovery heuristics for unknown repos live in `repo-discovery`; this skill is the source of truth for **what** a bounded context is and **how** to map the relationships between them.
+Reusable knowledge for identifying [bounded contexts](https://martinfowler.com/bliki/BoundedContext.html) and the [context map](https://martinfowler.com/bliki/BoundedContext.html) - the strategic design - **as it appears in an existing codebase**, and for documenting each context as a [Bounded Context Canvas](https://github.com/ddd-crew/bounded-context-canvas). The output is meant to be reviewed and refined with architects and teams. Discovery heuristics for unknown repos live in `repo-discovery`; this skill is the source of truth for **what** a bounded context is, **how** to map the relationships between them, and **how** to fill out a canvas per context.
 
 ## Strategic-design principles (apply everywhere)
 
@@ -46,6 +46,25 @@ Prefer breadth-first sampling over reading everything; cite representative files
 
 If neither input is available, derive contexts from code signals only and state in the output that boundaries were derived from code, not product vision/strategy (lower confidence).
 
+## The Bounded Context Canvas
+
+Each context is documented as a [Bounded Context Canvas](https://github.com/ddd-crew/bounded-context-canvas) (ddd-crew, CC BY 4.0): a one-page description of a single context's design. Fill the sections below. Many are strategic/operational and **cannot be derived from code** - emit `> TODO (human input needed): <what to confirm>` for those rather than guessing. Always keep model/term names verbatim and attach `(evidence: <path>)` to every code-derived claim.
+
+- **Name** - the context name (verbatim from the code/language where possible).
+- **Purpose** - a few sentences in **business language** (no technical detail) on the why and what of the context, and the key actors it serves. Often partly inferable from the ACC; otherwise a TODO.
+- **Strategic Classification** - three independent axes:
+  - *Domain*: `core` (key strategic differentiator) | `supporting` (necessary, not a differentiator) | `generic` (common, off-the-shelf capability).
+  - *Business Model*: `revenue generator` | `engagement creator` | `compliance enforcer` (usually a TODO unless the ACC/strategy says so).
+  - *Evolution* (Wardley): `genesis` | `custom built` | `product` | `commodity` (usually a TODO).
+- **Domain Roles** - how the context behaves, e.g. `analysis` (crunches data into insight), `execution` (enforces a workflow), `gateway`, `draft`, `audit`. Infer from code behavior; flag uncertain ones.
+- **Inbound Communication** - collaborations **initiated by others**. For each: the *message(s)* and their type (`command` = do something, `query` = ask for information, `event` = something happened), the *collaborator* (another context, a frontend, direct user interaction, an external system), and the *relationship type* (a context-map pattern, see below).
+- **Outbound Communication** - collaborations **initiated by this context** toward others; same message types and notations as inbound.
+- **Ubiquitous Language** - key domain terms in this context and what they mean (seed from `docs/ubiquitous-language.md` if present; keep terms verbatim).
+- **Business Decisions** - key business rules and policies enforced in the context (e.g. invariants, validations, pricing/refund rules).
+- **Assumptions** - design decisions made without full knowledge; make them explicit. Usually a TODO unless code comments/ADRs reveal them.
+- **Verification Metrics** - metrics that would tell the team whether the boundary is a good fit (from CI/CD, issue trackers, or live systems). Usually a TODO.
+- **Open Questions** - unanswered questions about the design; fold in the boundary/relationship `TODO`s discovered during analysis.
+
 ## Context-map relationship patterns
 
 Classify each relationship between two related contexts using these patterns. Mark direction where evident: **U** = upstream (influences), **D** = downstream (is influenced).
@@ -62,26 +81,60 @@ Classify each relationship between two related contexts using these patterns. Ma
 
 Cite the integration evidence for each relationship (client call, shared library, event topic, schema, etc.). If the relationship type cannot be determined, record the link with a `> TODO`.
 
-## Per-context fragment format (returned by each subagent)
+## Per-context canvas fragment format (returned by each subagent)
 
-Each `bc-context-analyzer` returns only:
+Each `bc-context-analyzer` returns one **filled Bounded Context Canvas** plus a short relationships/discussion block the orchestrator uses to build the index context map. Keep names verbatim, attach `(evidence: <path>)` to every code-derived claim, write `none found` for empty sections, and use `> TODO (human input needed): <...>` for anything not determinable from code.
 
 ```markdown
 ### Context: <context name>
 
 - Confidence: <high|medium|low>
 - Paths: <dir(s)/module(s)> (evidence: <path>)
-- Responsibility: <one-line capability this context owns>
-- Core model / language: <key aggregates/entities and domain terms, verbatim> (evidence: <files>)
-- Owned data: <stores/schemas/tables, or "none found"> (evidence: <path>)
-- Subdomain type: <core | supporting | generic | unknown>
 
-Relationships (outgoing/observed):
+#### Purpose
+<business-language why/what + key actors, or TODO>
+
+#### Strategic Classification
+- Domain: <core | supporting | generic | unknown> (evidence: <path>)
+- Business Model: <revenue generator | engagement creator | compliance enforcer | TODO>
+- Evolution: <genesis | custom built | product | commodity | TODO>
+
+#### Domain Roles
+- <role, e.g. execution / analysis / gateway> (evidence: <path>)
+
+#### Inbound Communication
+| Message | Type (command/query/event) | Collaborator | Relationship type |
+| --- | --- | --- | --- |
+| <message> | <type> | <context/frontend/user/external> | <pattern> (evidence: <path>) |
+
+#### Outbound Communication
+| Message | Type (command/query/event) | Collaborator | Relationship type |
+| --- | --- | --- | --- |
+| <message> | <type> | <context/frontend/user/external> | <pattern> (evidence: <path>) |
+
+#### Ubiquitous Language
+- `<Term>` - <meaning> (evidence: <path>)
+
+#### Business Decisions
+- <key rule/policy> (evidence: <path>)
+
+#### Assumptions
+- <assumption, or TODO>
+
+#### Verification Metrics
+- <metric, or TODO>
+
+#### Open Questions
+- <open question / unresolved boundary or relationship TODO>
+
+#### Owned data
+<stores/schemas/tables, or "none found"> (evidence: <path>)
+
+Relationships (for the index context map):
 - <other context> - <pattern: e.g. Customer/Supplier (D), ACL, OHS> - <integration evidence> (evidence: <path>)
-- > TODO (human input needed): <relationship/boundary to confirm>
 
-Discussion points:
+Discussion points (for the index):
 - <ambiguous boundary, possible split/merge, shared term, etc.> (evidence: <path>)
 ```
 
-If a section has nothing to report (e.g. no relationships), write "none found".
+The canvas sections feed `docs/bounded-contexts/<context>.md`; the trailing **Relationships** and **Discussion points** blocks feed the index `docs/bounded-contexts.md` (context map + discussion points).

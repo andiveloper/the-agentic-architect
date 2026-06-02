@@ -203,7 +203,8 @@ echo "  /build-architecture-communication-canvas   Fill the arc42 Architecture C
 echo "                                             (-> docs/architecture-communication-canvas.md)"
 echo "  /discover-ubiquitous-language              Discover the domain ubiquitous language from existing code for"
 echo "                                             review with domain experts (-> docs/ubiquitous-language.md)"
-echo "  /define-bounded-contexts                   Identify DDD bounded contexts and the context map for a repo"
-echo "                                             (-> docs/bounded-contexts.md)"
+echo "  /define-bounded-contexts                   Identify DDD bounded contexts and fill a Bounded Context Canvas"
+echo "                                             per context, plus a context map (-> docs/bounded-contexts/<context>.md"
+echo "                                             + docs/bounded-contexts.md index)"
 echo
 echo "Open a repository in your coding agent and run one of the commands above."

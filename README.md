@@ -6,7 +6,7 @@
 
 - **build-architecture-communication-canvas** - fill out the [arc42 Architecture Communication Canvas (ACC)](https://canvas.arc42.org/architecture-communication-canvas) for **any** repository, straight from your coding agent. It analyzes a codebase as a **black box** - no assumptions about language, framework, or layout - and produces a single, evidence-backed Markdown file with all nine ACC sections filled in. See a [sample canvas](build-architecture-communication-canvas/example-architecture-communication-canvas.md) for what the output looks like.
 - **discover-ubiquitous-language** - discover the [Domain-Driven Design ubiquitous language](https://martinfowler.com/bliki/UbiquitousLanguage.html) **as it actually appears in the code** - the real domain nouns, verbs, statuses, and events. It produces a domain-expert review artifact (a rough domain classification, a plain-language keyword/definition glossary, and explicit discussion points) so you can sit down with non-technical domain experts and find gaps and misunderstandings between code and domain. See a [sample glossary](discover-ubiquitous-language/example-ubiquitous-language.md).
-- **define-bounded-contexts** - identify the [Domain-Driven Design bounded contexts](https://martinfowler.com/bliki/BoundedContext.html) and the **context map** (how those contexts relate) for a repository. It scans the code black-box and, where available, folds in the outputs of the two tools above (Architecture Communication Canvas and ubiquitous language) to draw boundaries from product vision and domain language, not just folder structure. When neither input exists it asks whether to run those tools first or proceed code-only (lower quality). The result is an evidence-backed Markdown file listing each context plus a context map with the classic relationship patterns (Customer/Supplier, ACL, Open Host Service, ...). See a [sample context map](define-bounded-contexts/example-bounded-contexts.md).
+- **define-bounded-contexts** - identify the [Domain-Driven Design bounded contexts](https://martinfowler.com/bliki/BoundedContext.html) and the **context map** (how those contexts relate) for a repository, and fill out a [Bounded Context Canvas](https://github.com/ddd-crew/bounded-context-canvas) for each one. It scans the code black-box and, where available, folds in the outputs of the two tools above (Architecture Communication Canvas and ubiquitous language) to draw boundaries from product vision and domain language, not just folder structure. When neither input exists it asks whether to run those tools first or proceed code-only (lower quality). The result is one evidence-backed canvas per context under `docs/bounded-contexts/` plus an index (`docs/bounded-contexts.md`) with the context map and its classic relationship patterns (Customer/Supplier, ACL, Open Host Service, ...). See a [sample index](define-bounded-contexts/example-bounded-contexts.md) and a [sample canvas](define-bounded-contexts/example-bounded-contexts/sales.md).
 
 More tools (e.g. architecture review) will follow as additional top-level folders. The rest of this README focuses on the first tool, **build-architecture-communication-canvas**.
 
@@ -99,7 +99,7 @@ where `<base>` is `$HOME` (`--user`) or your `--target` directory. Run `./instal
 
 To discover the ubiquitous language instead, run `/discover-ubiquitous-language`. It writes `docs/ubiquitous-language.md` (rough domain classification, plain-language glossary, and discussion points) - take that file into a session with your domain experts to confirm meanings and surface gaps.
 
-To map the strategic design, run `/define-bounded-contexts`. It writes `docs/bounded-contexts.md` (the bounded contexts plus a context map of their relationships). It optionally consumes `docs/architecture-communication-canvas.md` and `docs/ubiquitous-language.md`; if both are missing it asks whether to run those tools first or proceed from code only.
+To map the strategic design, run `/define-bounded-contexts`. It writes one filled-out Bounded Context Canvas per context under `docs/bounded-contexts/<context>.md`, plus an index `docs/bounded-contexts.md` (the contexts list, a context map of their relationships, and discussion points). It optionally consumes `docs/architecture-communication-canvas.md` and `docs/ubiquitous-language.md`; if both are missing it asks whether to run those tools first or proceed from code only.
 
 ## What's in this repo
 
@@ -125,10 +125,11 @@ discover-ubiquitous-language/                     # the DDD ubiquitous-language 
 define-bounded-contexts/                          # the DDD bounded-context + context-map tool
   skills/
     define-bounded-contexts/                       # orchestrator entrypoint
-    ddd-bounded-contexts/                          # boundary signals + relationship patterns + template
+    ddd-bounded-contexts/                          # boundary signals + relationship patterns + canvas + index templates
   agents/
-    bc-context-analyzer.md                         # per-context analysis subagent
-  example-bounded-contexts.md                      # sample output
+    bc-context-analyzer.md                         # per-context canvas subagent
+  example-bounded-contexts.md                      # sample index output
+  example-bounded-contexts/                        # sample per-context Bounded Context Canvases
 install.sh
 ```
 
@@ -143,3 +144,5 @@ See [build-architecture-communication-canvas/example-architecture-communication-
 ## Credits
 
 The Architecture Communication Canvas is by Gernot Starke, Patrick Roos and arc42 contributors - <https://canvas.arc42.org/architecture-communication-canvas>.
+
+The Bounded Context Canvas is by the DDD Crew and contributors (CC BY 4.0) - <https://github.com/ddd-crew/bounded-context-canvas>.
