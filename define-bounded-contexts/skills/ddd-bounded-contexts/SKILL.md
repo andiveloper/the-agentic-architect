@@ -147,3 +147,7 @@ Discussion points (for the index):
 ```
 
 The canvas sections feed `docs/bounded-contexts/<context>.md`; the trailing **Relationships** and **Discussion points** blocks feed the index `docs/bounded-contexts.md` (context map + discussion points).
+
+## Updating existing outputs (re-run)
+
+These artifacts are re-runnable. When a canvas or the index already exists, merge into it rather than replacing it: keep human-authored edits and any `TODO (human input needed)` a human has since answered, refresh fields against the current code, add newly evidenced items, and rebuild the index contexts table and context-map mermaid diagram from the current set. Reuse existing context slugs so refreshed canvases land on the same files; a context that lost its evidence is marked retired in the index rather than silently deleted. These templates and conventions are authoritative over whatever shape the existing files have - they may predate changes to the canvas fields, the file layout (single file vs per-context files), the index/context-map format, or the diagram-vs-prose balance. Re-shape existing outputs to match the current templates and migrate preserved human content into the new structure rather than keeping the old layout.

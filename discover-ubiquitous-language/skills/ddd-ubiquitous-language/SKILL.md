@@ -79,3 +79,7 @@ Discussion points:
 ```
 
 If a section has nothing to report (e.g. no discussion points), write "none found".
+
+## Updating an existing glossary (re-run)
+
+The glossary is re-runnable. When `docs/ubiquitous-language.md` already exists, merge into it rather than replacing it: keep human-authored edits and any `TODO (human input needed)` a human has since answered (expert-confirmed definitions, notes, manual groupings), reuse the existing domain areas as the starting classification, add newly found terms, and refresh definitions whose code evidence changed. A term that no longer appears in the code is marked stale rather than silently deleted - keep terms verbatim either way. This template and these conventions are authoritative over whatever shape the existing file has - it may predate changes to the section set, layout (single vs multiple files), table-vs-prose balance, or evidence/TODO format. Re-shape the existing glossary to match the current template and migrate preserved human content into the new structure rather than keeping the old layout.
