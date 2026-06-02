@@ -1,19 +1,24 @@
 #!/usr/bin/env bash
 #
-# install.sh - install The Last Architect (arc42 ACC) skills + subagents into a
+# install.sh - install The Agentic Architect skills + subagents into a
 # coding-agent setup.
 #
-# Installs the build-architecture-communication-canvas toolkit (skills +
-# subagents) into one or more coding agents:
+# Installs all The Agentic Architect toolkits (skills + subagents) into one or
+# more coding agents:
 #   --cursor   Cursor:      <base>/.cursor/{skills,agents}
 #   --claude   Claude Code: <base>/.claude/{skills,agents}
+#
+# Toolkits installed:
+#   - build-architecture-communication-canvas (arc42 ACC)
+#   - discover-ubiquitous-language (DDD ubiquitous language discovery)
+#   - define-bounded-contexts (DDD bounded contexts + context map)
 #
 # Scope (pick exactly one):
 #   --target <dir>   project-scoped: into <dir>
 #   --user           user-scoped:    into $HOME
 #
 # Runs from a local checkout, or directly from GitHub without a checkout:
-#   curl -fsSL https://raw.githubusercontent.com/andiveloper/the-last-architect/main/install.sh | bash -s -- --cursor --user
+#   curl -fsSL https://raw.githubusercontent.com/andiveloper/the-agentic-architect/main/install.sh | bash -s -- --cursor --user
 #
 # Usage:
 #   ./install.sh --cursor --user
@@ -23,18 +28,19 @@
 
 set -euo pipefail
 
-REPO_SLUG="andiveloper/the-last-architect"
+REPO_SLUG="andiveloper/the-agentic-architect"
 REPO_BRANCH="main"
-TOOLKIT="build-architecture-communication-canvas"
+TOOLKITS=("build-architecture-communication-canvas" "discover-ubiquitous-language" "define-bounded-contexts")
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || true)"
 
 usage() {
   cat <<'EOF'
-install.sh - install The Last Architect (arc42 ACC) skills + subagents.
+install.sh - install The Agentic Architect skills + subagents.
 
-Installs the build-architecture-communication-canvas toolkit into one or more
-coding agents. Choose at least one agent and exactly one scope.
+Installs all The Agentic Architect toolkits (build-architecture-communication-canvas,
+discover-ubiquitous-language and define-bounded-contexts) into one or more coding
+agents. Choose at least one agent and exactly one scope.
 
 Agents (one or more):
   --cursor                        Cursor:      <base>/.cursor/{skills,agents}
@@ -51,7 +57,7 @@ Usage:
   ./install.sh --help
 
 Run directly from GitHub without a checkout:
-  curl -fsSL https://raw.githubusercontent.com/andiveloper/the-last-architect/main/install.sh | bash -s -- --cursor --user
+  curl -fsSL https://raw.githubusercontent.com/andiveloper/the-agentic-architect/main/install.sh | bash -s -- --cursor --user
 EOF
   exit "${1:-0}"
 }
@@ -107,9 +113,10 @@ if [[ "$MODE" == "target" && ! -d "$DEST_BASE" ]]; then
   exit 1
 fi
 
-# Locate the toolkit source: prefer a local checkout next to this script,
-# otherwise download the repo tarball from GitHub.
-SRC=""
+# Locate the toolkit source base (the directory containing the toolkit
+# folders): prefer a local checkout next to this script, otherwise download
+# the repo tarball from GitHub.
+SRC_BASE=""
 CLEANUP_DIR=""
 
 cleanup() {
@@ -119,10 +126,20 @@ cleanup() {
 }
 trap cleanup EXIT
 
-if [[ -n "$SCRIPT_DIR" && -d "$SCRIPT_DIR/$TOOLKIT/skills" && -d "$SCRIPT_DIR/$TOOLKIT/agents" ]]; then
-  SRC="$SCRIPT_DIR/$TOOLKIT"
+# True only if every toolkit's skills/agents exist under the given base dir.
+toolkits_present() {
+  local base="$1" tk
+  [[ -z "$base" ]] && return 1
+  for tk in "${TOOLKITS[@]}"; do
+    [[ -d "$base/$tk/skills" && -d "$base/$tk/agents" ]] || return 1
+  done
+  return 0
+}
+
+if toolkits_present "$SCRIPT_DIR"; then
+  SRC_BASE="$SCRIPT_DIR"
 else
-  echo "Local toolkit not found next to script; downloading from GitHub ($REPO_SLUG@$REPO_BRANCH)..."
+  echo "Local toolkits not found next to script; downloading from GitHub ($REPO_SLUG@$REPO_BRANCH)..."
   CLEANUP_DIR="$(mktemp -d)"
   TARBALL_URL="https://github.com/$REPO_SLUG/archive/refs/heads/$REPO_BRANCH.tar.gz"
   if command -v curl >/dev/null 2>&1; then
@@ -134,11 +151,12 @@ else
     exit 1
   fi
   tar -xzf "$CLEANUP_DIR/repo.tar.gz" -C "$CLEANUP_DIR"
-  SRC="$CLEANUP_DIR/the-last-architect-$REPO_BRANCH/$TOOLKIT"
+  SRC_BASE="$CLEANUP_DIR/the-agentic-architect-$REPO_BRANCH"
 fi
 
-if [[ ! -d "$SRC/skills" || ! -d "$SRC/agents" ]]; then
-  echo "error: cannot find toolkit skills/agents at $SRC" >&2
+if ! toolkits_present "$SRC_BASE"; then
+  echo "error: cannot find all toolkit skills/agents under $SRC_BASE" >&2
+  echo "       expected: ${TOOLKITS[*]}" >&2
   exit 1
 fi
 
@@ -155,13 +173,21 @@ copy_tree() {
 
 install_into() {
   # install_into <label> <config_dir>
-  local label="$1" cfg="$2"
+  local label="$1" cfg="$2" tk
   local dest="$DEST_BASE/$cfg"
-  echo "Installing The Last Architect ($label) into: $dest"
-  copy_tree "$SRC/skills" "$dest/skills"
-  copy_tree "$SRC/agents" "$dest/agents"
-  echo "  Skills:    $dest/skills/ (build-architecture-communication-canvas, arc42-acc-canvas, repo-discovery, acc-gap-analysis)"
-  echo "  Subagents: $dest/agents/ (9 acc-* category agents)"
+  echo "Installing The Agentic Architect ($label) into: $dest"
+  for tk in "${TOOLKITS[@]}"; do
+    copy_tree "$SRC_BASE/$tk/skills" "$dest/skills"
+    copy_tree "$SRC_BASE/$tk/agents" "$dest/agents"
+  done
+  echo "  Skills:    $dest/skills/"
+  echo "    - build-architecture-communication-canvas, arc42-acc-canvas, repo-discovery, acc-gap-analysis"
+  echo "    - discover-ubiquitous-language, ddd-ubiquitous-language"
+  echo "    - define-bounded-contexts, ddd-bounded-contexts"
+  echo "  Subagents: $dest/agents/"
+  echo "    - 9 acc-* category agents"
+  echo "    - ul-domain-extractor"
+  echo "    - bc-context-analyzer"
 }
 
 [[ "$WANT_CURSOR" -eq 1 ]] && install_into "Cursor" ".cursor"
@@ -169,4 +195,15 @@ install_into() {
 
 echo
 echo "Done."
-echo "Open a repository in your coding agent and run: /build-architecture-communication-canvas"
+echo
+echo "Available tools:"
+echo "  Command                                    What it does"
+echo "  -----------------------------------------  --------------------------------------------------------------"
+echo "  /build-architecture-communication-canvas   Fill the arc42 Architecture Communication Canvas for a repo"
+echo "                                             (-> docs/architecture-communication-canvas.md)"
+echo "  /discover-ubiquitous-language              Discover the domain ubiquitous language from existing code for"
+echo "                                             review with domain experts (-> docs/ubiquitous-language.md)"
+echo "  /define-bounded-contexts                   Identify DDD bounded contexts and the context map for a repo"
+echo "                                             (-> docs/bounded-contexts.md)"
+echo
+echo "Open a repository in your coding agent and run one of the commands above."

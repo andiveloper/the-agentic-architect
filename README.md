@@ -1,12 +1,14 @@
-# The Last Architect
+# The Agentic Architect
 
-**The Last Architect** equips coding agents with reusable guidance for architectural work - so your agent ([Cursor](https://cursor.com/docs) or [Claude Code](https://code.claude.com/docs)) can genuinely assist software and solution architects and development teams, not just write code. It is a growing toolbelt of skills and subagents, each focused on one architecture task and installable on its own.
+**The Agentic Architect** equips coding agents with reusable guidance for architectural work - so your agent ([Cursor](https://cursor.com/docs) or [Claude Code](https://code.claude.com/docs)) can genuinely assist software and solution architects and development teams, not just write code. It is a growing toolbelt of skills and subagents, each focused on one architecture task and installable on its own.
 
 ## Tools on the belt
 
-- **build-architecture-communication-canvas** *(first tool)* - fill out the [arc42 Architecture Communication Canvas (ACC)](https://canvas.arc42.org/architecture-communication-canvas) for **any** repository, straight from your coding agent. It analyzes a codebase as a **black box** - no assumptions about language, framework, or layout - and produces a single, evidence-backed Markdown file with all nine ACC sections filled in. See a [sample canvas](build-architecture-communication-canvas/example-architecture-communication-canvas.md) for what the output looks like.
+- **build-architecture-communication-canvas** - fill out the [arc42 Architecture Communication Canvas (ACC)](https://canvas.arc42.org/architecture-communication-canvas) for **any** repository, straight from your coding agent. It analyzes a codebase as a **black box** - no assumptions about language, framework, or layout - and produces a single, evidence-backed Markdown file with all nine ACC sections filled in. See a [sample canvas](build-architecture-communication-canvas/example-architecture-communication-canvas.md) for what the output looks like.
+- **discover-ubiquitous-language** - discover the [Domain-Driven Design ubiquitous language](https://martinfowler.com/bliki/UbiquitousLanguage.html) **as it actually appears in the code** - the real domain nouns, verbs, statuses, and events. It produces a domain-expert review artifact (a rough domain classification, a plain-language keyword/definition glossary, and explicit discussion points) so you can sit down with non-technical domain experts and find gaps and misunderstandings between code and domain. See a [sample glossary](discover-ubiquitous-language/example-ubiquitous-language.md).
+- **define-bounded-contexts** - identify the [Domain-Driven Design bounded contexts](https://martinfowler.com/bliki/BoundedContext.html) and the **context map** (how those contexts relate) for a repository. It scans the code black-box and, where available, folds in the outputs of the two tools above (Architecture Communication Canvas and ubiquitous language) to draw boundaries from product vision and domain language, not just folder structure. When neither input exists it asks whether to run those tools first or proceed code-only (lower quality). The result is an evidence-backed Markdown file listing each context plus a context map with the classic relationship patterns (Customer/Supplier, ACL, Open Host Service, ...). See a [sample context map](define-bounded-contexts/example-bounded-contexts.md).
 
-More tools (e.g. architecture review) will follow as additional top-level folders. The rest of this README covers the first tool, **build-architecture-communication-canvas**.
+More tools (e.g. architecture review) will follow as additional top-level folders. The rest of this README focuses on the first tool, **build-architecture-communication-canvas**.
 
 ## What is the Architecture Communication Canvas?
 
@@ -60,17 +62,17 @@ The `install.sh` script copies the toolkit's skills and subagents into the right
 
 ```bash
 # Cursor, user-scoped (all your projects):
-curl -fsSL https://raw.githubusercontent.com/andiveloper/the-last-architect/main/install.sh | bash -s -- --cursor --user
+curl -fsSL https://raw.githubusercontent.com/andiveloper/the-agentic-architect/main/install.sh | bash -s -- --cursor --user
 
 # Claude Code, into a specific project:
-curl -fsSL https://raw.githubusercontent.com/andiveloper/the-last-architect/main/install.sh | bash -s -- --claude --target /path/to/your/project
+curl -fsSL https://raw.githubusercontent.com/andiveloper/the-agentic-architect/main/install.sh | bash -s -- --claude --target /path/to/your/project
 ```
 
 ### Option B - from a local checkout
 
 ```bash
-git clone https://github.com/andiveloper/the-last-architect.git
-cd the-last-architect
+git clone https://github.com/andiveloper/the-agentic-architect.git
+cd the-agentic-architect
 
 # Cursor + Claude Code into another project (project-scoped):
 ./install.sh --cursor --claude --target /path/to/your/project
@@ -95,6 +97,10 @@ where `<base>` is `$HOME` (`--user`) or your `--target` directory. Run `./instal
 3. Answer the Missing Inputs Report (add docs or answer questions, or skip).
 4. Review `docs/architecture-communication-canvas.md` and resolve any `TODO (human input needed)` placeholders.
 
+To discover the ubiquitous language instead, run `/discover-ubiquitous-language`. It writes `docs/ubiquitous-language.md` (rough domain classification, plain-language glossary, and discussion points) - take that file into a session with your domain experts to confirm meanings and surface gaps.
+
+To map the strategic design, run `/define-bounded-contexts`. It writes `docs/bounded-contexts.md` (the bounded contexts plus a context map of their relationships). It optionally consumes `docs/architecture-communication-canvas.md` and `docs/ubiquitous-language.md`; if both are missing it asks whether to run those tools first or proceed from code only.
+
 ## What's in this repo
 
 The toolkit is agent-neutral: source files live in a single top-level folder and `install.sh` maps them into each coding agent's directories. Future toolkits (e.g. `architecture-review/`) will be added as sibling top-level folders.
@@ -109,6 +115,20 @@ build-architecture-communication-canvas/         # the ACC tool (first on the be
   agents/
     acc-value-proposition.md ... acc-risks-missing-info.md   # 9 category subagents
   example-architecture-communication-canvas.md    # sample output
+discover-ubiquitous-language/                     # the DDD ubiquitous-language tool
+  skills/
+    discover-ubiquitous-language/                  # orchestrator entrypoint
+    ddd-ubiquitous-language/                       # DDD term heuristics + output template
+  agents/
+    ul-domain-extractor.md                         # per-area term-extraction subagent
+  example-ubiquitous-language.md                   # sample output
+define-bounded-contexts/                          # the DDD bounded-context + context-map tool
+  skills/
+    define-bounded-contexts/                       # orchestrator entrypoint
+    ddd-bounded-contexts/                          # boundary signals + relationship patterns + template
+  agents/
+    bc-context-analyzer.md                         # per-context analysis subagent
+  example-bounded-contexts.md                      # sample output
 install.sh
 ```
 
