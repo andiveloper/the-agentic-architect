@@ -1,0 +1,20 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Logs / temp
+*.log
+tmp/
+.tmp/
+
+# Node (only relevant if examples grow)
+node_modules/
+
+# Local canvas output produced while testing the toolkit against this repo
+/docs/architecture-communication-canvas.md
