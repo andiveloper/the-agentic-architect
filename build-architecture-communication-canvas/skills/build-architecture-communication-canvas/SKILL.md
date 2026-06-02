@@ -26,10 +26,10 @@ Copy this checklist and track progress:
 
 ```
 - [ ] Step 0: detect existing canvas -> initial run vs update run
-- [ ] Phase 1: gap-scan all 9 categories (parallel) and merge into Missing Inputs Report
-- [ ] Present report to the user
-- [ ] Phase 2: collect documents and/or inline answers (or accept skip)
-- [ ] Phase 3: fill all 9 categories (parallel) with collected inputs
+- [ ] Phase 1: gap-scan all 9 categories (parallel) and merge into Missing Inputs Report; detect docs/commit-analysis.md
+- [ ] Present report to the user; if commit-analysis is missing, ask upfront whether to run /analyze-commits
+- [ ] Phase 2: collect documents and/or inline answers (or accept skip); run /analyze-commits if the user agreed
+- [ ] Phase 3: fill all 9 categories (parallel) with collected inputs (pass commit-analysis to the Risks subagent)
 - [ ] Assemble and write docs/architecture-communication-canvas.md (merge if updating)
 - [ ] Render docs/architecture-communication-canvas.html via the acc-canvas-html subagent
 - [ ] Summarize unresolved TODOs (and what changed, if updating) to the user
@@ -51,18 +51,20 @@ This tool is re-runnable. Before anything else, check whether `docs/architecture
 
 1. Launch all nine subagents in parallel with `mode: gap-scan`. In each prompt include: the mode, the repository root path, and the instruction to return only the gap-scan fragment defined in `acc-gap-analysis`.
 2. Collect the nine fragments and merge them into one **Missing Inputs Report** using the format in `acc-gap-analysis` (per category: confidence without input, derivable now, missing, resolve-by document/question).
-3. Present the report to the user, ending with the call to action: reply with documents/paths and/or answers, or say `skip`.
+3. Check whether `docs/commit-analysis.md` exists. If it is **absent**, include in the report's call to action an upfront offer to run `/analyze-commits` first (per `acc-gap-analysis` "Offering to run /analyze-commits") - it strengthens the Risks section. If it is present, note it as a source for Risks.
+4. Present the report to the user, ending with the call to action: reply with documents/paths and/or answers, run `/analyze-commits` (if offered), or say `skip`.
 
 ### Phase 2 - Input collection
 
 1. If the user provides document paths or pasted text, note each as a source for the relevant category.
 2. For categories still missing, you may ask the inline questions from `acc-gap-analysis` via the AskQuestion tool. Asking is optional and every question is skippable.
-3. Record, per category, the collected inputs (document paths, pasted text, or direct answers) and their provenance. Anything left unresolved stays a gap - do not block.
+3. If the user agreed to run `/analyze-commits`, run that tool's flow now (per the `analyze-commits` skill) so `docs/commit-analysis.md` exists before Phase 3; note it as a source for the Risks category.
+4. Record, per category, the collected inputs (document paths, pasted text, or direct answers) and their provenance. Anything left unresolved stays a gap - do not block.
 
 ### Phase 3 - Autonomous fill (no human intervention)
 
 1. Launch all nine subagents in parallel with `mode: fill`. In each prompt include: the mode, the repository root path, and that category's collected inputs/answers verbatim (subagents start with clean context, so inline everything they need). Tell each to return only its section body following `arc42-acc-canvas` conventions.
-2. For `acc-risks-missing-info`, also pass the de-duplicated list of unresolved `TODO`/gap items surfaced by the other eight subagents so it can populate "Missing information".
+2. For `acc-risks-missing-info`, also pass the de-duplicated list of unresolved `TODO`/gap items surfaced by the other eight subagents so it can populate "Missing information", and - if `docs/commit-analysis.md` exists - pass its path/contents so it can fold the commit-history risks (churn/bug hotspots, bus factor, firefighting, velocity) into the Risks list cited `(source: docs/commit-analysis.md)`.
 3. Do not prompt the user during this phase.
 
 ### Assemble and write

@@ -22,7 +22,7 @@ For each category: what is usually derivable from the repo vs. what requires hum
 | Components / Modules | Dir structure, workspaces, services, packages | Intended logical architecture if not evidenced |
 | Core Decisions | ADRs, design docs, notable git history | The good/bad judgement and rationale behind decisions |
 | Technologies | Manifests, lockfiles, Dockerfiles, CI, IaC | Ops/runtime details not in the repo (hosting, datacenter) |
-| Risks and Missing Information | TODO/FIXME, deprecated deps, missing tests/CI | Known operational pains, organizational risks |
+| Risks and Missing Information | TODO/FIXME, deprecated deps, missing tests/CI, `docs/commit-analysis.md` (churn/bug hotspots, bus factor, firefighting) | Known operational pains, organizational risks |
 
 ## Detecting existing input documents
 
@@ -32,8 +32,16 @@ Before asking the user, look for inputs already present:
 - **ADRs / decisions**: `docs/adr/`, `adr/`, `decisions/`, `*.adr.md`, numbered decision files with Context/Decision/Consequences headings, `ARCHITECTURE.md`, RFC folders.
 - **Quality/ops docs**: `SECURITY.md`, SLO/SLA docs, runbooks, on-call docs.
 - **Stakeholder hints**: `CODEOWNERS`, `AUTHORS`, `MAINTAINERS*`, `.github/FUNDING.yml`, governance docs.
+- **Commit-history analysis**: `docs/commit-analysis.md` (produced by `/analyze-commits`) - a strong input for the Risks and Missing Information category.
 
 If a relevant document exists, treat it as a candidate source (cite it with `(source: <path>)`) instead of marking the category missing.
+
+## Offering to run /analyze-commits (Risks input)
+
+`docs/commit-analysis.md` (from the `/analyze-commits` tool) materially strengthens the Risks and Missing Information category - it surfaces churn/bug hotspots, bus-factor concentration, deploy-trust problems, and velocity decline. During gap analysis:
+
+- **If it exists:** treat it as a source for Risks (cite `(source: docs/commit-analysis.md)`); do not ask.
+- **If it is absent:** ask the user **upfront** (alongside presenting the Missing Inputs Report) whether to run `/analyze-commits` first. It only needs git history and produces `docs/commit-analysis.md` in a couple of minutes. If they agree, run it before Phase 3 and feed the output to the Risks subagent; if they decline, proceed and Risks falls back to static repo signals only.
 
 ## Missing Inputs Report format
 

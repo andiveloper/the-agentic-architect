@@ -43,15 +43,26 @@ Sample output: index [Markdown](define-bounded-contexts/example-bounded-contexts
 
 [![Bounded Context Canvas - Sales (sample HTML overview)](define-bounded-contexts/example-bounded-contexts/sales.png)](define-bounded-contexts/example-bounded-contexts/sales.png)
 
+### 4. `/analyze-commits`
+
+**Goal:** diagnose a repository from its **git history before reading any code** - which files to read first, and what to be careful of.
+
+It runs the five diagnostics from Ally Piechowski's [The Git Commands I Run Before Reading Any Code](https://piechowski.io/post/git-commands-before-reading-code/) - code-churn hotspots, contributors and bus factor, bug clusters, project velocity, and firefighting/crisis patterns - cross-references churn against bugs to surface the highest-risk files, and assembles everything into a single Markdown report with a verdict and explicit data caveats. The result lands in `docs/commit-analysis.md`.
+
+This tool is **independent of the others and can be run at any time** - it only needs git history, not the other artifacts. It's **recommended as the first step**, though: it gives you your bearings before you read any code, and `/build-architecture-communication-canvas` consumes its output (when present) to enrich the Risks section. If it hasn't been run, the canvas tool offers to run it upfront during gap analysis.
+
+Sample output: [Markdown](analyze-commits/example-commit-analysis.md)
+
 More tools (e.g. architecture review) will follow as additional top-level folders.
 
 ### Recommended order
 
-The tools stand alone, but they compose - later tools get richer when earlier outputs exist. For a fresh repo, run them in this order:
+The tools stand alone, but they compose - later tools get richer when earlier outputs exist. For a fresh or inherited repo, run them in this order:
 
-1. **`/build-architecture-communication-canvas`** - establish the big picture: value proposition, stakeholders, components, decisions, and quality goals.
-2. **`/discover-ubiquitous-language`** - extract the real domain vocabulary from the code, then validate it with domain experts.
-3. **`/define-bounded-contexts`** - draw the bounded contexts and context map, informed by the product vision (from step 1) and the domain language (from step 2).
+1. **`/analyze-commits`** - get your bearings before reading any code: which files are risky, who knows the system, and where it's heading. Pure git-history diagnostics, **independent of the others and runnable at any time**; running it first lets `/build-architecture-communication-canvas` reuse its findings for the Risks section.
+2. **`/build-architecture-communication-canvas`** - establish the big picture: value proposition, stakeholders, components, decisions, and quality goals.
+3. **`/discover-ubiquitous-language`** - extract the real domain vocabulary from the code, then validate it with domain experts.
+4. **`/define-bounded-contexts`** - draw the bounded contexts and context map, informed by the product vision (from step 2) and the domain language (from step 3).
 
 `/define-bounded-contexts` will detect and fold in the outputs of steps 1-2 automatically; if they're missing it offers to run them first or proceed code-only (lower quality).
 
@@ -112,13 +123,14 @@ where `<base>` is `$HOME` (`--user`) or your `--target` directory. Run `./instal
 
 1. Open the repository you want to document in your coding agent (Cursor or Claude Code).
 2. Run the slash command for the tool you want:
+   - `/analyze-commits` → `docs/commit-analysis.md`
    - `/build-architecture-communication-canvas` → `docs/architecture-communication-canvas.md`
    - `/discover-ubiquitous-language` → `docs/ubiquitous-language.md`
    - `/define-bounded-contexts` → `docs/bounded-contexts.md` + one canvas per context under `docs/bounded-contexts/`
 3. Answer the gap report inline (add docs or answer questions, or skip).
 4. Review the generated file(s) and resolve any `TODO (human input needed)` placeholders.
 
-The tools compose: `/define-bounded-contexts` optionally consumes the outputs of the other two, so running all three in the [recommended order](#recommended-order) yields the richest result.
+The tools compose: `/build-architecture-communication-canvas` consumes `/analyze-commits`' output for its Risks section (and offers to run it upfront if missing), and `/define-bounded-contexts` optionally consumes the canvas and ubiquitous-language outputs - so running them in the [recommended order](#recommended-order) yields the richest result.
 
 ## What's in this repo
 
@@ -152,6 +164,13 @@ define-bounded-contexts/                          # the DDD bounded-context + co
     bc-context-analyzer.md                         # per-context canvas subagent
   example-bounded-contexts.md                      # sample index output (Markdown)
   example-bounded-contexts/                        # sample per-context canvases (Markdown + HTML + PNG preview)
+analyze-commits/                                  # the git-history diagnostics tool
+  skills/
+    analyze-commits/                               # orchestrator entrypoint
+    git-history-diagnostics/                       # exact git commands + interpretation rules + output template
+  agents/
+    commit-churn-analyst.md ... commit-firefighting-analyst.md  # 5 per-diagnostic subagents (one git command each)
+  example-commit-analysis.md                       # sample output (Markdown)
 install.sh
 ```
 
@@ -164,3 +183,5 @@ install.sh
 The Architecture Communication Canvas is by Gernot Starke, Patrick Roos and arc42 contributors - <https://canvas.arc42.org/architecture-communication-canvas>.
 
 The Bounded Context Canvas is by the DDD Crew and contributors (CC BY 4.0) - <https://github.com/ddd-crew/bounded-context-canvas>.
+
+The `/analyze-commits` diagnostics are based on Ally Piechowski's "The Git Commands I Run Before Reading Any Code" - <https://piechowski.io/post/git-commands-before-reading-code/>.

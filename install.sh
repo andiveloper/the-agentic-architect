@@ -12,6 +12,7 @@
 #   - build-architecture-communication-canvas (arc42 ACC)
 #   - discover-ubiquitous-language (DDD ubiquitous language discovery)
 #   - define-bounded-contexts (DDD bounded contexts + context map)
+#   - analyze-commits (git-history diagnostics)
 #
 # Scope (pick exactly one):
 #   --target <dir>   project-scoped: into <dir>
@@ -30,7 +31,7 @@ set -euo pipefail
 
 REPO_SLUG="andiveloper/the-agentic-architect"
 REPO_BRANCH="main"
-TOOLKITS=("build-architecture-communication-canvas" "discover-ubiquitous-language" "define-bounded-contexts")
+TOOLKITS=("build-architecture-communication-canvas" "discover-ubiquitous-language" "define-bounded-contexts" "analyze-commits")
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || true)"
 
@@ -39,8 +40,8 @@ usage() {
 install.sh - install The Agentic Architect skills + subagents.
 
 Installs all The Agentic Architect toolkits (build-architecture-communication-canvas,
-discover-ubiquitous-language and define-bounded-contexts) into one or more coding
-agents. Choose at least one agent and exactly one scope.
+discover-ubiquitous-language, define-bounded-contexts and analyze-commits) into one or
+more coding agents. Choose at least one agent and exactly one scope.
 
 Agents (one or more):
   --cursor                        Cursor:      <base>/.cursor/{skills,agents}
@@ -184,10 +185,12 @@ install_into() {
   echo "    - build-architecture-communication-canvas, arc42-acc-canvas, repo-discovery, acc-gap-analysis"
   echo "    - discover-ubiquitous-language, ddd-ubiquitous-language"
   echo "    - define-bounded-contexts, ddd-bounded-contexts"
+  echo "    - analyze-commits, git-history-diagnostics"
   echo "  Subagents: $dest/agents/"
   echo "    - 9 acc-* category agents + acc-canvas-html (HTML overview renderer)"
   echo "    - ul-domain-extractor"
   echo "    - bc-context-analyzer"
+  echo "    - 5 commit-* diagnostic agents (churn, contributors, bug-cluster, velocity, firefighting)"
 }
 
 [[ "$WANT_CURSOR" -eq 1 ]] && install_into "Cursor" ".cursor"
@@ -196,9 +199,11 @@ install_into() {
 echo
 echo "Done."
 echo
-echo "Available tools:"
+echo "Available tools (listed in the recommended run order):"
 echo "  Command                                    What it does"
 echo "  -----------------------------------------  --------------------------------------------------------------"
+echo "  /analyze-commits                           Diagnose a repo from its git history (churn, bus factor, bug"
+echo "                                             clusters, velocity, firefighting) (-> docs/commit-analysis.md)"
 echo "  /build-architecture-communication-canvas   Fill the arc42 Architecture Communication Canvas for a repo"
 echo "                                             (-> docs/architecture-communication-canvas.md)"
 echo "  /discover-ubiquitous-language              Discover the domain ubiquitous language from existing code for"
@@ -207,4 +212,5 @@ echo "  /define-bounded-contexts                   Identify DDD bounded contexts
 echo "                                             per context, plus a context map (-> docs/bounded-contexts/<context>.md"
 echo "                                             + docs/bounded-contexts.md index)"
 echo
+echo "Tools stand alone but compose; for a fresh or inherited repo, run them top-to-bottom."
 echo "Open a repository in your coding agent and run one of the commands above."
