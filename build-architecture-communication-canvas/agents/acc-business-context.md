@@ -21,7 +21,7 @@ The orchestrator passes `mode: gap-scan` or `mode: fill` (and, for fill, user in
 Return the gap-scan fragment per `acc-gap-analysis`. External integrations are often derivable; their business criticality may need input.
 
 ### fill
-Produce the **Business Context** section body per `arc42-acc-canvas` conventions (Confidence line, evidence tags, `Inferred:`, TODO placeholders). List neighbouring systems/actors with direction (source/sink) and evidence; mark unknown criticality as TODO. A small list or context-diagram-as-bullets is ideal. Return only the section body, no heading.
+Produce the **Business Context** section body per `arc42-acc-canvas` conventions (Confidence line, evidence tags, `Inferred:`, TODO placeholders). Lead with a one-line caption, then a mermaid context diagram (the system as one central node; each neighbouring system / external interface / actor a node; edges showing direction - inbound sources point into the system, outbound sinks are pointed to by it), following the mermaid guardrail in `arc42-acc-canvas`. Expand any abbreviation used as a label. Follow it with concise evidence bullets: each neighbour/actor with direction (source/sink) and evidence; mark unknown criticality as TODO. Return only the section body, no heading.
 
 ## Rules
-Read-only. No assumptions. Only list integrations with concrete evidence. Return only your fragment.
+Read-only. No assumptions. Only list integrations with concrete evidence (in the diagram and the bullets). Return only your fragment.

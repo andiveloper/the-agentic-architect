@@ -51,6 +51,8 @@ flowchart LR
     delivery -->|"Customer/Supplier"| billing
 ```
 
+Legend: OHS = Open Host Service; Conformist, Customer/Supplier, and Published Language are context-map integration patterns; arrows point upstream -> downstream (U = upstream, D = downstream).
+
 ---
 
 ## Discussion points / possible gaps

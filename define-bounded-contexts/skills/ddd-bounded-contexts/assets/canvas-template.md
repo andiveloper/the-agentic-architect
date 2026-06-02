@@ -34,7 +34,7 @@ For anything not determinable from code (e.g. business model, evolution, assumpt
 
 ## Inbound Communication
 
-Collaborations initiated by others. Message types: command (do something), query (ask for information), event (something happened).
+Collaborations initiated by others. Message types: command (do something), query (ask for information), event (something happened). In the Relationship type column, expand any pattern acronym on first use - `ACL (Anti-Corruption Layer)`, `OHS (Open Host Service)` - and `(U)`/`(D)` mark upstream/downstream.
 
 | Message | Type | Collaborator | Relationship type |
 | --- | --- | --- | --- |

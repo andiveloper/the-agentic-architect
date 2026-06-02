@@ -16,10 +16,11 @@ The orchestrator passes you: an **area name**, that area's **paths**, and the **
 Mine the ubiquitous language - the real domain nouns, verbs, statuses, events, and roles - **as the code actually uses it**, so it can be reviewed with non-technical domain experts to find gaps and misunderstandings.
 
 1. Find domain terms using the signals in `ddd-ubiquitous-language` (type/class names, enum values, DB tables/columns, API resources, events/commands, domain methods, status strings, docs).
-2. Keep each term **verbatim** as it appears in code - do not normalize, correct, or invent names. Preserve notable variants.
-3. Write a one-sentence, **plain-language** definition of the apparent domain meaning (not implementation). If meaning is unclear, emit `> TODO (human input needed): <what to ask the expert>` instead of guessing.
-4. Exclude purely technical/framework jargon (see the skill's exclusion list); when unsure, keep the term and add a discussion point.
-5. Flag **discussion points** you observe in your area: synonyms/near-duplicates, conflicting usages, unclear abbreviations.
+2. Focus on the **most important** terms a domain expert would recognize and care about - core nouns, verbs, statuses, events, roles. Do not pad the glossary with low-signal or near-duplicate technical names; surface notable variants/synonyms as discussion points instead of extra rows.
+3. Keep each kept term **verbatim** as it appears in code - do not normalize, correct, or invent names.
+4. Write one short, **plain-language** sentence per term describing its apparent domain meaning (not implementation). Always expand abbreviations/acronyms in the definition (or make the expansion the TODO question if uncertain). If meaning is unclear, emit `> TODO (human input needed): <what to ask the expert>` instead of guessing.
+5. Exclude purely technical/framework jargon (see the skill's exclusion list); when unsure, keep the term and add a discussion point.
+6. Flag **discussion points** you observe in your area: synonyms/near-duplicates, conflicting usages, unclear abbreviations.
 
 ## Output
 Return only the per-area fragment defined in `ddd-ubiquitous-language` (the `### Area:` block with the `| Term | Definition |` table, suggested group, and discussion points). Every term carries an evidence tag `(evidence: <file>)`. Write "none found" for empty sections. No preamble, no extra commentary.

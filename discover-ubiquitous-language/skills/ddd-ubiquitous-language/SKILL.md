@@ -11,9 +11,10 @@ Reusable knowledge for discovering the [ubiquitous language](https://martinfowle
 ## Review-with-experts principles (apply everywhere)
 
 1. **Mirror the code, do not sanitize it.** Record each term exactly as it appears in the code (casing, abbreviation, plural/singular). Keep notable variants (`custOrd`, `CustomerOrder`, `cust_order`) - never normalize or invent a "better" name. Inconsistencies are signal, not noise.
-2. **Plain-language definitions.** One short, jargon-free sentence describing what the term appears to mean *in the domain*, never how it is implemented. A non-technical reader must be able to confirm or refute it. If meaning is unclear, do not guess - emit a TODO.
+2. **Plain-language definitions.** One short, jargon-free sentence describing what the term appears to mean *in the domain*, never how it is implemented. A non-technical reader must be able to confirm or refute it. If meaning is unclear, do not guess - emit a TODO. When a term is an abbreviation or acronym (e.g. `POD`, `SKU`), always expand it in the definition - or, if it cannot be expanded with confidence, make that the explicit question in the TODO.
 3. **Evidence-or-gap.** Every term carries an evidence tag citing the artifact(s) it came from: `(evidence: src/orders/Order.java)`. If meaning cannot be determined, emit `> TODO (human input needed): <what to ask the expert>`.
 4. **Surface discussion points.** Flag, for expert review: synonyms / near-duplicates pointing at one concept; the same word used with different meanings in different areas; unclear abbreviations; and undetermined-meaning terms.
+5. **Focus on the most important terms; stay concise.** This is a review artifact, not an exhaustive index. Prioritize the core domain nouns, verbs, statuses, events, and roles a domain expert would actually recognize and care about; do not pad the glossary with low-signal or near-duplicate technical names. This does not conflict with "mirror the code": every term you *do* keep stays verbatim, and notable variants/synonyms worth discussing are still surfaced - as discussion points rather than extra glossary rows. Keep each definition to one short, jargon-free sentence. Prefer tables over prose throughout.
 
 ## What counts as ubiquitous language
 
@@ -55,6 +56,7 @@ Group the discovered terms into a handful of candidate domain areas (subdomains)
 - Derive areas from top-level modules/packages/services, directory names, or natural clusters of related terms (e.g. `Orders`, `Delivery`, `Billing`, `Catalog`).
 - Assign each term to its most fitting area. Terms that span areas or have no clear home go under a **Shared / cross-cutting** area.
 - Keep the number of areas small (typically 3-8). If the repo is flat/small, a single area is fine.
+- Present the classification as an `| Area | Terms |` table (one row per area, terms comma-separated), not a bullet list.
 
 ## Per-area fragment format (returned by each subagent)
 

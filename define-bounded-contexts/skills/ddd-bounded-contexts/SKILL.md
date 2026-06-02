@@ -14,6 +14,7 @@ Reusable knowledge for identifying [bounded contexts](https://martinfowler.com/b
 2. **A context owns its model and (usually) its data.** Prefer boundaries where a cluster of types/aggregates, their language, and their persistence belong together and are not shared wholesale with other areas.
 3. **Always map relationships.** Identifying contexts is only half the work; classify how each pair of related contexts integrates and in which direction (upstream/downstream). A list without a context map is incomplete.
 4. **Evidence-or-gap.** Every context and relationship cites the artifact(s) it came from `(evidence: services/billing/)`. Weakly evidenced boundaries are marked `Inferred:` and low-confidence. If something cannot be determined, emit `> TODO (human input needed): <what to confirm>` - never guess.
+5. **Always explain abbreviations.** Never leave a bare acronym in a diagram, table, or sentence. Expand it on first use with a short explanation - `OHS (Open Host Service)`, `ACL (Anti-Corruption Layer)`, `U`/`D` = upstream/downstream - and add a one-line legend beneath any diagram that uses abbreviations.
 
 ## What is a bounded context (vs not)
 
@@ -80,6 +81,14 @@ Classify each relationship between two related contexts using these patterns. Ma
 - **Big Ball of Mud** - flag (as a risk/discussion point) when no clear boundary exists and models are tangled.
 
 Cite the integration evidence for each relationship (client call, shared library, event topic, schema, etc.). If the relationship type cannot be determined, record the link with a `> TODO`.
+
+### Context map: required mermaid diagram
+
+The index (`docs/bounded-contexts.md`) MUST render the context map as a mermaid diagram (one node per context, one edge per relationship, the pattern as the edge label, direction from upstream to downstream), built from the relationships table - it is not optional. Keep prose concise: prefer the diagram and the tables over paragraphs; a context's Purpose/rationale is 1-2 short sentences.
+
+Mermaid guardrail (so the diagram renders): no spaces in node IDs (use the lowercased context name); put the display name in brackets (`sales["Sales"]`); quote any label containing `/`, `(`, `)`, or `:` - e.g. `sales -->|"Customer/Supplier"| delivery`; no styling, colors, or `click` directives.
+
+Always explain abbreviations: directly beneath the diagram add a one-line **Legend** expanding every pattern abbreviation actually used as an edge label (e.g. `OHS = Open Host Service`, `ACL = Anti-Corruption Layer`) and the direction convention (arrows point upstream -> downstream; `U` = upstream, `D` = downstream). Never leave a bare acronym in a diagram, table, or sentence without expanding it on first use - `OHS (Open Host Service)`.
 
 ## Per-context canvas fragment format (returned by each subagent)
 

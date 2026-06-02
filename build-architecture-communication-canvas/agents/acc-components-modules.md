@@ -21,7 +21,7 @@ The orchestrator passes `mode: gap-scan` or `mode: fill` (and, for fill, user in
 Return the gap-scan fragment per `acc-gap-analysis`. Structure is usually derivable; note if the intended logical architecture is unclear.
 
 ### fill
-Produce the **Components / Modules** section body per `arc42-acc-canvas` conventions (Confidence line, evidence tags, `Inferred:`, TODO placeholders). List the major building blocks with a one-line responsibility each, citing the directory/manifest evidence. For a flat repo, say so and treat it as one component. Return only the section body, no heading.
+Produce the **Components / Modules** section body per `arc42-acc-canvas` conventions (Confidence line, evidence tags, `Inferred:`, TODO placeholders). Lead with a one-line caption, then a mermaid component diagram (each major building block a node, dependencies/calls as edges), following the mermaid guardrail in `arc42-acc-canvas`. Expand any abbreviation used as a label. Follow it with concise bullets giving each block a one-line responsibility and citing the directory/manifest evidence. For a flat repo, say so and treat it as one component (a single-node diagram). Return only the section body, no heading.
 
 ## Rules
 Read-only. No assumptions about layout. Map only blocks that exist; mark intended architecture as TODO if not evidenced. Return only your fragment.

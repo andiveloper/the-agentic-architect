@@ -39,12 +39,16 @@ How the contexts integrate. Patterns: Partnership, Shared Kernel, Customer/Suppl
 | <context> | <context> | <pattern> | <client/event/schema> (evidence: <path>) |
 | <context> | <context> | <pattern> | > TODO (human input needed): <relationship to confirm> |
 
+<!-- REQUIRED: render the table above as this mermaid diagram (one node per context, one edge per relationship, pattern as the edge label). Quote labels with special chars, e.g. |"Customer/Supplier"|; no spaces in node IDs; no styling. -->
+
 ```mermaid
 flowchart LR
     contextA["<Context A>"] -->|"Customer/Supplier"| contextB["<Context B>"]
     contextA -->|"ACL"| contextC["<Context C>"]
     contextB -.->|"Published Language"| contextC
 ```
+
+Legend: <expand every abbreviation used above, e.g. ACL = Anti-Corruption Layer, OHS = Open Host Service>; arrows point upstream -> downstream (U = upstream, D = downstream).
 
 ---
 

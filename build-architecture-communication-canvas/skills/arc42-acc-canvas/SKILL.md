@@ -40,6 +40,28 @@ Every category section MUST follow these conventions so the document is trustwor
 3. **Confidence label.** Begin each section body with a confidence line: `Confidence: high | medium | low` reflecting how much rests on direct evidence versus inference.
 4. **Inference marker.** Statements that are reasoned rather than directly evidenced are prefixed with `Inferred:` and still carry an evidence tag for the signals they were inferred from.
 
+## Diagrams (prefer over prose)
+
+Two sections are inherently structural and MUST lead with a mermaid diagram, followed by tight evidence bullets (diagram nodes cannot carry `(evidence: ...)` tags, so evidence lives in the bullets beneath):
+
+- **Business Context** - a context diagram: the system as one central node, each neighbouring system / external interface / actor as a node, edges showing direction (an inbound source points *into* the system; an outbound sink is pointed *to* by the system).
+- **Components / Modules** - a component diagram: each major building block a node, dependencies/calls as edges.
+
+Every other section stays concise: prefer tight bullet lists over prose, and a diagram over a list wherever it communicates better.
+
+Every diagram is self-explanatory: precede it with a one-line caption saying what it shows, and if any node or edge label uses an abbreviation, add a short legend beneath expanding it.
+
+### Always explain abbreviations
+
+Never leave a bare acronym anywhere in the canvas (diagram, table, or sentence). Expand it on first use with a short explanation - e.g. `CI (Continuous Integration)`, `SLO (Service Level Objective)`, `ADR (Architecture Decision Record)`, `JWT (JSON Web Token)`. This keeps the canvas readable by non-experts.
+
+### Mermaid guardrail
+
+So generated diagrams render:
+- No spaces in node IDs (use camelCase or underscores); put the human label in brackets: `taskflow["Taskflow API"]`.
+- Quote any edge or node label containing `/`, `(`, `)`, or `:` - e.g. `a -->|"Customer/Supplier"| b`.
+- Do not add styling, colors, or `click` directives - let the default theme apply.
+
 ## Output template
 
 The final document follows [assets/template.md](assets/template.md) exactly. It is written to `docs/architecture-communication-canvas.md` by default. The template:
@@ -52,7 +74,7 @@ The final document follows [assets/template.md](assets/template.md) exactly. It 
 When assembling fragments returned by the category subagents:
 
 1. Insert each subagent's fragment under its matching section heading, unchanged except for trivial whitespace.
-2. Preserve every evidence tag and `TODO (human input needed)` placeholder verbatim.
+2. Preserve every evidence tag, `TODO (human input needed)` placeholder, and mermaid diagram block verbatim.
 3. For **Risks and Missing Information**, append the de-duplicated union of all `TODO`/gap items surfaced by the other eight subagents, grouped under a "Missing information" subheading, after the risk findings.
 4. Do not collapse or summarize away placeholders - unresolved gaps must remain visible.
 5. Fill the header fields (system name, date, repo) from evidence where possible; otherwise mark them as TODO.

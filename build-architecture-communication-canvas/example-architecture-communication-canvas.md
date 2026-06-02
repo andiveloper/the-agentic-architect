@@ -47,8 +47,8 @@ Confidence: medium
 
 - Reliability: retry-with-backoff on task execution (evidence: src/scheduler/retry.ts).
 - Performance: Redis caching of task lookups (evidence: src/cache/redis.ts); load test present (evidence: tests/load/k6.js).
-- Security: JWT auth middleware and input validation (evidence: src/middleware/auth.ts, src/middleware/validate.ts).
-- > TODO (human input needed): Provide concrete targets (e.g. p99 latency, availability SLO) - none are stated in the repo.
+- Security: JWT (JSON Web Token) auth middleware and input validation (evidence: src/middleware/auth.ts, src/middleware/validate.ts).
+- > TODO (human input needed): Provide concrete targets (e.g. p99 latency, availability SLO (Service Level Objective)) - none are stated in the repo.
 
 ---
 
@@ -57,6 +57,19 @@ Confidence: medium
 ### Business Context
 
 Confidence: high
+
+Context diagram: Taskflow API and its neighbouring systems (arrows show data direction).
+
+```mermaid
+flowchart LR
+    taskflow["Taskflow API"]
+    postgres["PostgreSQL"] --> taskflow
+    taskflow --> postgres
+    redis["Redis"] --> taskflow
+    taskflow --> redis
+    taskflow --> stripe["Stripe"]
+    taskflow --> webhooks["Customer webhook endpoints"]
+```
 
 - PostgreSQL - primary datastore (sink/source) (evidence: docker-compose.yml, src/db/).
 - Redis - cache and queue broker (evidence: docker-compose.yml, src/cache/redis.ts).
@@ -68,6 +81,17 @@ Confidence: high
 
 Confidence: high
 
+Component diagram: the major modules and their dependencies (arrows show "depends on / calls").
+
+```mermaid
+flowchart TD
+    api["api - HTTP routing"] --> scheduler["scheduler - cron/retries"]
+    api --> db["db - persistence"]
+    scheduler --> webhooksMod["webhooks - outbound delivery"]
+    scheduler --> cache["cache - Redis access"]
+    scheduler --> db
+```
+
 - `api` - HTTP routing and request handling (evidence: src/routes/).
 - `scheduler` - cron parsing, execution, retries (evidence: src/scheduler/).
 - `webhooks` - outbound delivery (evidence: src/webhooks/).
@@ -78,7 +102,7 @@ Confidence: high
 
 Confidence: low
 
-- ADR-0001: Use Redis as both cache and queue (evidence: docs/adr/0001-redis-as-queue.md).
+- ADR-0001 (ADR = Architecture Decision Record): Use Redis as both cache and queue (evidence: docs/adr/0001-redis-as-queue.md).
 - Inferred: monorepo with a single deployable service (evidence: single package.json, no workspace manifest).
 - > TODO (human input needed): Which decisions are you proud of vs. regret? No verdicts are recorded in the ADRs.
 
@@ -89,7 +113,7 @@ Confidence: high
 - Languages: TypeScript / Node.js (evidence: package.json, tsconfig.json, .nvmrc).
 - Frameworks/libraries: Express, BullMQ, Zod (evidence: package.json).
 - Data/middleware: PostgreSQL, Redis (evidence: docker-compose.yml).
-- Infrastructure/CI: Docker, GitHub Actions (evidence: Dockerfile, .github/workflows/ci.yml).
+- Infrastructure / CI (Continuous Integration): Docker, GitHub Actions (evidence: Dockerfile, .github/workflows/ci.yml).
 - Observability: pino logging (evidence: src/logger.ts).
 - > TODO (human input needed): Hosting/datacenter and monitoring stack are not described in the repo.
 

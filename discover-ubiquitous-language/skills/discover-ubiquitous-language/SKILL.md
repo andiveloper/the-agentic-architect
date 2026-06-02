@@ -53,7 +53,7 @@ Copy this checklist and track progress:
 ### Assemble and write
 
 1. Load the template from the `ddd-ubiquitous-language` skill (`assets/template.md`).
-2. Fill it: purpose framing line, Domain classification, the `| Term | Definition |` glossary, and the Discussion points / possible gaps section. Preserve every evidence tag and TODO placeholder.
+2. Fill it: purpose framing line, the Domain classification as an `| Area | Terms |` table, the `| Term | Definition |` glossary (most important terms, one short definition each), and the Discussion points / possible gaps section. Preserve every evidence tag and TODO placeholder.
 3. Write the result to `docs/ubiquitous-language.md` (create the `docs/` directory if needed). If the file exists, confirm overwrite with the user.
 4. Report a short summary: term count, the domain groups, and the discussion points / unresolved TODOs to take to domain experts.
 
@@ -61,5 +61,6 @@ Copy this checklist and track progress:
 
 - Black-box: never assume language, framework, or layout (see `repo-discovery`).
 - Mirror the code; keep terms verbatim. Never invent or rename terms.
+- Focus on the most important terms; do not pad the glossary. Surface notable variants/synonyms as discussion points, not extra rows.
 - Evidence-or-gap: every term cites a real artifact; unknowns become `> TODO (human input needed): ...` placeholders, never guessed.
-- Keep the document concise and readable by non-technical domain experts.
+- Keep the document concise and table-first, readable by non-technical domain experts.

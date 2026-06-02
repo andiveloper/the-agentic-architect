@@ -16,18 +16,20 @@ This is an illustrative sample for a fictional commerce/delivery system.
 
 ## Domain classification
 
-Rough grouping of the discovered terms into candidate domain areas (for discussion, not a rigorous bounded-context map).
+Rough grouping of the most important discovered terms into candidate domain areas (for discussion, not a rigorous bounded-context map).
 
-- **Orders**: `Order`, `OrderLine`, `custOrd`, `Backordered`, `OrderPlaced`
-- **Delivery**: `DeliveryNote`, `Shipment`, `Courier`, `Dispatch`, `POD`
-- **Billing**: `Invoice`, `Settle`, `Refund`, `Tariff`
-- **Shared / cross-cutting**: `Customer`, `Merchant`
+| Area | Terms |
+| --- | --- |
+| Orders | `Order`, `OrderLine`, `custOrd`, `Backordered`, `OrderPlaced` |
+| Delivery | `DeliveryNote`, `Shipment`, `Courier`, `Dispatch`, `POD` |
+| Billing | `Invoice`, `Settle`, `Refund`, `Tariff` |
+| Shared / cross-cutting | `Customer`, `Merchant` |
 
 ---
 
 ## Ubiquitous Language
 
-Each term is recorded exactly as it appears in the code; each definition is one plain-language sentence describing its apparent domain meaning.
+The most important domain terms, recorded exactly as they appear in the code; each definition is one short, plain-language sentence describing its apparent domain meaning.
 
 | Term | Definition |
 | --- | --- |

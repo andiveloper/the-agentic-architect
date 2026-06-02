@@ -48,13 +48,29 @@ Confidence: <high|medium|low>
 
 Confidence: <high|medium|low>
 
-<content>
+Context diagram: <System Name> and its neighbouring systems / actors (arrows show data direction).
+
+```mermaid
+flowchart LR
+    system["<System Name>"]
+    <neighbourIn>["<Neighbour / actor>"] --> system
+    system --> <neighbourOut>["<Neighbour / external system>"]
+```
+
+<concise evidence bullets: each neighbour/actor with direction (source/sink) and `(evidence: ...)`, or `> TODO (human input needed): ...`>
 
 ### Components / Modules
 
 Confidence: <high|medium|low>
 
-<content>
+Component diagram: the major building blocks and their dependencies (arrows show "depends on / calls").
+
+```mermaid
+flowchart TD
+    <blockA>["<block> - <one-line responsibility>"] --> <blockB>["<block> - <one-line responsibility>"]
+```
+
+<concise evidence bullets: each block with a one-line responsibility and `(evidence: ...)`>
 
 ### Core Decisions (Good or Bad)
 

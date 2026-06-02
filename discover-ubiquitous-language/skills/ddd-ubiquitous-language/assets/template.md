@@ -16,17 +16,19 @@ Replace every <...> placeholder. Keep terms verbatim from the code, evidence tag
 
 ## Domain classification
 
-Rough grouping of the discovered terms into candidate domain areas (for discussion, not a rigorous bounded-context map).
+Rough grouping of the most important discovered terms into candidate domain areas (for discussion, not a rigorous bounded-context map).
 
-- **<Area name>**: <term>, <term>, <term>
-- **<Area name>**: <term>, <term>
-- **Shared / cross-cutting**: <term>, <term>
+| Area | Terms |
+| --- | --- |
+| <Area name> | <term>, <term>, <term> |
+| <Area name> | <term>, <term> |
+| Shared / cross-cutting | <term>, <term> |
 
 ---
 
 ## Ubiquitous Language
 
-Each term is recorded exactly as it appears in the code; each definition is one plain-language sentence describing its apparent domain meaning.
+The most important domain terms, recorded exactly as they appear in the code; each definition is one short, plain-language sentence describing its apparent domain meaning.
 
 | Term | Definition |
 | --- | --- |
