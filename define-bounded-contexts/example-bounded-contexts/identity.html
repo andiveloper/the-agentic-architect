@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Identity - Bounded Context Canvas</title>
+<style>
+:root {
+  --line: #c9c9c9;
+  --ink: #1c1c1c;
+  --muted: #8a8a8a;
+  --bg: #f4f5f7;
+  --query: #d9ead3;
+  --query-b: #93c47d;
+  --command: #cfe2f3;
+  --command-b: #6fa8dc;
+  --event: #fff2cc;
+  --event-b: #f1c232;
+  --decision: #d9d2e9;
+  --decision-b: #8e7cc3;
+  --evidence: #7a7a7a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  padding: 28px;
+}
+.canvas {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  overflow: hidden;
+}
+header.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  border-bottom: 2px solid var(--ink);
+}
+header.title .name { padding: 14px 18px; flex: 1; }
+header.title .name h1 { margin: 0; font-size: 26px; letter-spacing: .2px; }
+header.title .name .meta { margin: 8px 0 0; }
+header.title .attribution {
+  border-left: 2px solid var(--ink);
+  padding: 14px 18px;
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: right;
+  min-width: 240px;
+}
+ul.meta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--muted);
+  columns: 2;
+}
+ul.meta li { margin: 0; }
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  grid-template-areas:
+    "purpose strategic roles"
+    "inbound center outbound"
+    "assumptions metrics questions";
+}
+.cell, .footer-cell {
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 16px;
+  min-height: 110px;
+}
+.area-purpose { grid-area: purpose; }
+.area-strategic { grid-area: strategic; }
+.area-roles { grid-area: roles; border-right: none; }
+.area-inbound { grid-area: inbound; }
+.area-center { grid-area: center; background: #fafafa; display: flex; flex-direction: column; }
+.area-outbound { grid-area: outbound; border-right: none; }
+.area-assumptions { grid-area: assumptions; }
+.area-metrics { grid-area: metrics; }
+.area-questions { grid-area: questions; border-right: none; }
+.cell h2, .inner h2 { margin: 0 0 2px; font-size: 15px; font-weight: 700; }
+.cell-sub { color: var(--muted); font-size: 11.5px; font-weight: 600; margin-bottom: 8px; }
+.cell-body { font-size: 13px; }
+.cell-body p { margin: 0 0 8px; }
+.cell-body p:last-child { margin-bottom: 0; }
+.muted { color: var(--muted); font-style: italic; }
+code {
+  background: #eef0f2;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font: 12px/1.4 "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+a { color: #1a56db; }
+.evidence { display: inline-block; color: var(--evidence); font-size: 11px; font-style: italic; }
+.todo {
+  color: #b54708;
+  background: #fff4e5;
+  border-left: 3px solid #f1c232;
+  padding: 2px 8px;
+  display: inline-block;
+  border-radius: 0 3px 3px 0;
+}
+ul.bullets { margin: 0; padding-left: 18px; }
+ul.bullets li { margin: 0 0 7px; }
+.strategic-grid { display: flex; gap: 14px; flex-wrap: wrap; }
+.strat-col { flex: 1; min-width: 90px; }
+.strat-label { font-size: 11px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); font-weight: 700; }
+.strat-value { font-size: 14px; font-weight: 600; margin-top: 2px; }
+.rationale { color: #444; font-size: 12.5px; margin-top: 10px; }
+.comm-list { display: flex; flex-direction: column; gap: 10px; }
+.comm-row { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; background: #fff; }
+.comm-row.none { color: var(--muted); font-style: italic; border-style: dashed; }
+.comm-head { display: flex; align-items: baseline; gap: 8px; }
+.comm-msg { font-weight: 600; }
+.comm-collab { font-size: 12px; color: #444; margin-top: 3px; }
+.comm-rel { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+.chip {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+.chip.query { background: var(--query); border-color: var(--query-b); }
+.chip.command { background: var(--command); border-color: var(--command-b); }
+.chip.event { background: var(--event); border-color: var(--event-b); }
+.chip.other { background: #eee; }
+.inner { padding-bottom: 14px; }
+.inner.area-decisions { padding-bottom: 0; margin-top: auto; padding-top: 14px; }
+.term-list { display: flex; flex-direction: column; gap: 8px; }
+.term { border: 1px dashed var(--line); border-radius: 5px; padding: 7px 10px; background: #fff; }
+.term-name { font-weight: 700; }
+.term-meaning { font-size: 12.5px; color: #444; margin-top: 2px; }
+.decision-list { display: flex; flex-direction: column; gap: 8px; }
+.decision { background: var(--decision); border: 1px solid var(--decision-b); border-radius: 5px; padding: 7px 10px; }
+.footer-cell { border-right: none; border-bottom: none; background: #fafafa; }
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "purpose" "strategic" "roles"
+      "inbound" "center" "outbound"
+      "assumptions" "metrics" "questions";
+  }
+  .cell { border-right: none; }
+  ul.meta { columns: 1; }
+}
+</style>
+</head>
+<body>
+<main class="canvas">
+  <header class="title">
+    <div class="name">
+      <h1>Identity</h1>
+      <ul class="meta">
+        <li>Repository: github.com/example/shopflow</li>
+        <li>Generated: 2026-06-02</li>
+        <li>Generated by: The Agentic Architect (define-bounded-contexts)</li>
+        <li>Confidence: medium</li>
+        <li>Paths: <code>src/shared/auth/</code> <span class="evidence">evidence: src/shared/auth/</span></li>
+      </ul>
+    </div>
+    <div class="attribution">
+      <div>Bounded Context Canvas V5</div>
+      <div>github.com/ddd-crew/bounded-context-canvas</div>
+      <div>CC BY 4.0</div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <section class="cell area-purpose">
+      <h2>Purpose</h2>
+      <div class="cell-body">
+        <p>Authenticate users and resolve who a <code>Customer</code> or <code>Merchant</code> is, so other contexts can act on behalf of a known actor. Serves every other context as a supporting capability. <span class="evidence">evidence: src/shared/auth/IdentityApi.kt</span></p>
+      </div>
+    </section>
+
+    <section class="cell area-strategic">
+      <h2>Strategic Classification</h2>
+      <div class="cell-body">
+        <div class="strategic-grid">
+          <div class="strat-col"><div class="strat-label">Domain</div><div class="strat-value">generic</div></div>
+          <div class="strat-col"><div class="strat-label">Business Model</div><div class="strat-value">compliance enforcer</div></div>
+          <div class="strat-col"><div class="strat-label">Evolution</div><div class="strat-value">commodity</div></div>
+        </div>
+        <p class="rationale">Domain rationale: authentication is a common, off-the-shelf-style capability, not a differentiator <span class="evidence">evidence: src/shared/auth/Session.kt</span></p>
+      </div>
+    </section>
+
+    <section class="cell area-roles">
+      <h2>Domain Roles</h2>
+      <div class="cell-body">
+        <ul class="bullets">
+          <li>gateway - resolves and authenticates actors for other contexts <span class="evidence">evidence: src/shared/auth/IdentityApi.kt</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="cell area-inbound">
+      <h2>Inbound Communication</h2>
+      <div class="cell-sub">Collaborations initiated by others</div>
+      <div class="cell-body">
+        <div class="comm-list">
+          <div class="comm-row">
+            <div class="comm-head"><span class="chip command">Command</span><span class="comm-msg">Log in</span></div>
+            <div class="comm-collab">direct user (web frontend)</div>
+            <div class="comm-rel">(frontend-owned UI) <span class="evidence">evidence: src/shared/auth/AuthController.kt</span></div>
+          </div>
+          <div class="comm-row">
+            <div class="comm-head"><span class="chip query">Query</span><span class="comm-msg">Resolve current customer</span></div>
+            <div class="comm-collab">Sales</div>
+            <div class="comm-rel">Open Host Service (U) <span class="evidence">evidence: src/shared/auth/IdentityApi.kt</span></div>
+          </div>
+          <div class="comm-row">
+            <div class="comm-head"><span class="chip query">Query</span><span class="comm-msg">Resolve customer address</span></div>
+            <div class="comm-collab">Delivery</div>
+            <div class="comm-rel">Conformist (U) <span class="evidence">evidence: src/delivery/Shipment.kt</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cell area-center">
+      <div class="inner area-language">
+        <h2>Ubiquitous Language</h2>
+        <div class="cell-sub">Context-specific domain terminology</div>
+        <div class="cell-body">
+          <div class="term-list">
+            <div class="term">
+              <div class="term-name"><code>User</code></div>
+              <div class="term-meaning">An authenticated account <span class="evidence">evidence: src/shared/auth/User.kt</span></div>
+            </div>
+            <div class="term">
+              <div class="term-name"><code>Session</code></div>
+              <div class="term-meaning">An active authenticated period for a user <span class="evidence">evidence: src/shared/auth/Session.kt</span></div>
+            </div>
+            <div class="term">
+              <div class="term-name"><code>Customer</code></div>
+              <div class="term-meaning">A user who buys <span class="evidence">evidence: src/shared/Customer.kt</span></div>
+            </div>
+            <div class="term">
+              <div class="term-name"><code>Merchant</code></div>
+              <div class="term-meaning">A user who sells through ShopFlow <span class="evidence">evidence: src/shared/Merchant.kt</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner area-decisions">
+        <h2>Business Decisions</h2>
+        <div class="cell-sub">Key business rules, policies, and decisions</div>
+        <div class="cell-body">
+          <div class="decision-list">
+            <div class="decision">A request without a valid <code>Session</code> is unauthenticated and rejected <span class="evidence">evidence: src/shared/auth/Session.kt</span></div>
+            <div class="decision"><span class="todo">TODO (human input needed): confirm session expiry and password policy.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cell area-outbound">
+      <h2>Outbound Communication</h2>
+      <div class="cell-sub">Messages this context initiates</div>
+      <div class="cell-body">
+        <div class="comm-list">
+          <p class="muted">none found</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cell area-assumptions">
+      <h2>Assumptions</h2>
+      <div class="cell-body">
+        <ul class="bullets">
+          <li><span class="todo">TODO (human input needed): confirm whether <code>Customer</code>/<code>Merchant</code> should truly belong to Identity or be a shared kernel.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="cell area-metrics">
+      <h2>Verification Metrics</h2>
+      <div class="cell-body">
+        <ul class="bullets">
+          <li><span class="todo">TODO (human input needed): define fitness metrics, e.g. auth failure rate.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="cell area-questions">
+      <h2>Open Questions</h2>
+      <div class="cell-body">
+        <ul class="bullets">
+          <li>Identity lives under <code>src/shared/</code> and mixes auth with the shared <code>Customer</code>/<code>Merchant</code> model - is it a true context or a shared kernel? <span class="evidence">evidence: src/shared/Customer.kt, src/shared/auth/</span></li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="footer">
+    <section class="footer-cell">
+      <h2>Owned data</h2>
+      <div class="cell-body">
+        <p><code>identity</code> schema (<code>users</code>, <code>sessions</code> tables) <span class="evidence">evidence: db/migrations/V1__users.sql</span></p>
+      </div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

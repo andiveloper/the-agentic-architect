@@ -148,6 +148,12 @@ Discussion points (for the index):
 
 The canvas sections feed `docs/bounded-contexts/<context>.md`; the trailing **Relationships** and **Discussion points** blocks feed the index `docs/bounded-contexts.md` (context map + discussion points).
 
+## HTML overview per canvas
+
+Alongside each markdown canvas, produce a single-page **HTML overview** that renders the canvas in the visual ddd-crew Bounded Context Canvas layout (Purpose / Strategic Classification / Domain Roles across the top; Inbound Communication, Ubiquitous Language + Business Decisions, Outbound Communication in the middle; Assumptions / Verification Metrics / Open Questions across the bottom; Owned data footer). The template is `assets/canvas-template.html` - a self-contained file (inline CSS, no JS or external assets) with `{{TOKEN}}` slots and per-cell fill instructions.
+
+Render it by **filling the template from the markdown, not by parsing it with a script**: the markdown's exact shape varies between runs and models, so a brittle parser would silently drop content. Transcribe the markdown into the template's cells verbatim - keep domain terms, every `(evidence: <path>)` tag, and every `> TODO (human input needed)` line - using the template's helper spans (`<code>`, `<span class="evidence">`, `<span class="todo">`). Clone the example item markup once per table row / bullet / term, follow the cell comments, strip the leading instruction comment block, and keep the wrapper tags, class names, and `<style>` block unchanged so every overview looks identical.
+
 ## Updating existing outputs (re-run)
 
 These artifacts are re-runnable. When a canvas or the index already exists, merge into it rather than replacing it: keep human-authored edits and any `TODO (human input needed)` a human has since answered, refresh fields against the current code, add newly evidenced items, and rebuild the index contexts table and context-map mermaid diagram from the current set. Reuse existing context slugs so refreshed canvases land on the same files; a context that lost its evidence is marked retired in the index rather than silently deleted. These templates and conventions are authoritative over whatever shape the existing files have - they may predate changes to the canvas fields, the file layout (single file vs per-context files), the index/context-map format, or the diagram-vs-prose balance. Re-shape existing outputs to match the current templates and migrate preserved human content into the new structure rather than keeping the old layout.

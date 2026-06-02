@@ -69,6 +69,10 @@ The final document follows [assets/template.md](assets/template.md) exactly. It 
 - Includes a short header (system name, generation date, repo identifier if known).
 - Ends with a "Provenance" note listing which sections used user input vs. repo evidence.
 
+## HTML overview
+
+A one-page, canvas-styled HTML overview can be generated from the Markdown using [assets/canvas-template.html](assets/canvas-template.html). It lays out the three areas as columns (Requirements / Solution / Problems & risks) with a full-width Value Proposition band, gray section cards with confidence badges, evidence/TODO styling, and in-browser mermaid rendering. The `acc-canvas-html` subagent fills this template **faithfully** from the Markdown - it is a renderer, never an analyst, and adds no facts. The fill rules and Markdown -> HTML mapping live in the template's top comment. Output defaults to `docs/architecture-communication-canvas.html`.
+
 ## Assembly rules (orchestrator)
 
 When assembling fragments returned by the category subagents:

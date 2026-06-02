@@ -185,7 +185,7 @@ install_into() {
   echo "    - discover-ubiquitous-language, ddd-ubiquitous-language"
   echo "    - define-bounded-contexts, ddd-bounded-contexts"
   echo "  Subagents: $dest/agents/"
-  echo "    - 9 acc-* category agents"
+  echo "    - 9 acc-* category agents + acc-canvas-html (HTML overview renderer)"
   echo "    - ul-domain-extractor"
   echo "    - bc-context-analyzer"
 }

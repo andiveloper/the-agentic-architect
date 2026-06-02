@@ -27,9 +27,10 @@ Two artifacts produced by sibling tools, if present, sharpen the analysis far be
 
 **Detect both before doing anything else.** If at least one exists, use it. If **both are missing**, you must ask the user how to proceed (see step 0) - because without them, bounded contexts can only be derived from existing code, not the product vision or strategy, which materially lowers quality.
 
-## The subagent
+## The subagents
 
-`bc-context-analyzer` - a readonly per-context analyzer. There is one subagent *type*, spawned once per candidate bounded context (scoped to that context's paths). Launch them with the Task tool, all in a single message (parallel).
+- `bc-context-analyzer` - a **readonly** per-context analyzer, spawned once per candidate bounded context (scoped to that context's paths) to produce its filled canvas fragment. Launch them with the Task tool, all in a single message (parallel).
+- `bc-canvas-html-renderer` - a **write-capable** per-context renderer, spawned once per context during the write step to turn that context's markdown canvas into an HTML overview by filling the HTML template. Launch one per context, in parallel.
 
 ## Workflow
 
@@ -42,6 +43,7 @@ Copy this checklist and track progress:
 - [ ] Analyze each context: one bc-context-analyzer per candidate (parallel), each returning a filled canvas
 - [ ] Merge contexts; classify relationships into a context map
 - [ ] Write one canvas per context to docs/bounded-contexts/<context>.md (merge if updating)
+- [ ] Render an HTML overview per canvas to docs/bounded-contexts/<context>.html (subagent fills the HTML template from the markdown)
 - [ ] Assemble and write the index docs/bounded-contexts.md (context map + discussion points; merge if updating)
 - [ ] Summarize context count, relationships, and discussion points / TODOs (and what changed, if updating)
 ```
@@ -87,10 +89,11 @@ This tool is re-runnable. Check whether the index `docs/bounded-contexts.md` and
 
 1. Load both templates from the `ddd-bounded-contexts` skill: `assets/canvas-template.md` (one per context) and `assets/template.md` (the index).
 2. For **each context**, fill `assets/canvas-template.md` from that context's canvas fragment (purpose, strategic classification, domain roles, inbound/outbound communication, ubiquitous language, business decisions, assumptions, verification metrics, open questions, owned data) and write it to `docs/bounded-contexts/<context-slug>.md`. Slug the filename from the context name (lowercase, hyphenated). Preserve every evidence tag and TODO placeholder.
+   - **HTML overview (one per canvas):** also render each canvas as a single-page HTML overview laid out like the ddd-crew Bounded Context Canvas, written to `docs/bounded-contexts/<context-slug>.html`. Do **not** write a parser/script - the markdown shape varies by run and model. Instead, for each context launch a `bc-canvas-html-renderer` subagent (one per context, in parallel) and pass it three paths: the just-written **markdown** `docs/bounded-contexts/<context-slug>.md`, the **template** `ddd-bounded-contexts/assets/canvas-template.html`, and the **output** `docs/bounded-contexts/<context-slug>.html`. It transcribes the markdown into the template's cells verbatim (keeping terms, every `(evidence: ...)` tag, and every `> TODO (human input needed)` line - never inventing or summarising away content), strips the template's instruction comments, and writes the HTML. (`bc-canvas-html-renderer` is write-capable; do not use the readonly `bc-context-analyzer` for this.)
 3. Fill the index `assets/template.md`: purpose framing line (including the "derived from code only" note if applicable), the contexts table linking to each `bounded-contexts/<context-slug>.md` canvas, the relationships / context-map section with its **required** mermaid diagram (built from each canvas's inbound/outbound communication and the trailing relationships blocks; follow the mermaid guardrail in `ddd-bounded-contexts`), and Discussion points / possible gaps. Write it to `docs/bounded-contexts.md`. Keep prose concise - prefer the diagram and tables over paragraphs.
 4. Create the `docs/` and `docs/bounded-contexts/` directories if needed.
-   - **Initial run:** write each canvas and the index.
-   - **Update run:** reconcile with the existing files instead of overwriting blindly. Per canvas, preserve human-authored content and answered TODOs, refresh fields whose evidence changed, and add newly discovered items; for a context that no longer has supporting evidence, mark it retired in the index rather than silently deleting its file (ask the user before deleting any canvas file). Rebuild the index's contexts table and context-map mermaid diagram from the current set. Only fall back to a full overwrite (after confirming with the user) if a file cannot be cleanly merged.
+   - **Initial run:** write each canvas, its HTML overview, and the index.
+   - **Update run:** reconcile with the existing files instead of overwriting blindly. Per canvas, preserve human-authored content and answered TODOs, refresh fields whose evidence changed, and add newly discovered items; for a context that no longer has supporting evidence, mark it retired in the index rather than silently deleting its file (ask the user before deleting any canvas file). Rebuild the index's contexts table and context-map mermaid diagram from the current set. Re-render each refreshed canvas's HTML overview from its updated markdown. Only fall back to a full overwrite (after confirming with the user) if a file cannot be cleanly merged.
 5. Report a short summary: number of contexts (and their canvas files), the relationships in the map, and the discussion points / unresolved TODOs to take to the team. On an update run, also summarize what changed (contexts added/split/merged/retired, relationships changed, items added or marked stale).
 
 ## Rules
