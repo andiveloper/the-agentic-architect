@@ -1,6 +1,6 @@
 ---
 name: arc42-acc-canvas
-description: Defines the arc42 Architecture Communication Canvas (ACC) - its nine categories, the output Markdown template, evidence/TODO conventions, and final assembly rules. Use when building, assembling, or formatting an ACC document, or when a subagent needs the canonical definition and source-vs-human guidance for a canvas category.
+description: Defines the arc42 Architecture Communication Canvas (ACC) - its nine categories, the output templates (Markdown/Mermaid, HTML overview, draw.io canvas), evidence/TODO conventions, and final assembly rules. Use when building, assembling, or formatting an ACC document, or when a subagent needs the canonical definition and source-vs-human guidance for a canvas category.
 disable-model-invocation: true
 ---
 
@@ -62,16 +62,29 @@ So generated diagrams render:
 - Quote any edge or node label containing `/`, `(`, `)`, or `:` - e.g. `a -->|"Customer/Supplier"| b`.
 - Do not add styling, colors, or `click` directives - let the default theme apply.
 
-## Output template
+## Outputs
 
-The final document follows [assets/template.md](assets/template.md) exactly. It is written to `docs/architecture-communication-canvas.md` by default. The template:
-- Keeps the three-area grouping and all nine sections in canonical order.
-- Includes a short header (system name, generation date, repo identifier if known).
-- Ends with a "Provenance" note listing which sections used user input vs. repo evidence.
+The tool produces three artifacts from the same content, all under `docs/`:
 
-## HTML overview
+1. **Markdown / Mermaid** (`docs/architecture-communication-canvas.md`) - the canonical, human-editable source. The renderable HTML and draw.io artifacts are derived from it.
+2. **HTML overview** (`docs/architecture-communication-canvas.html`) - a one-page, canvas-styled visual overview.
+3. **draw.io canvas** (`docs/architecture-communication-canvas.drawio`) - an editable diagram on the original arc42 ACC canvas layout.
 
-A one-page, canvas-styled HTML overview can be generated from the Markdown using [assets/canvas-template.html](assets/canvas-template.html). It lays out the three areas as columns (Requirements / Solution / Problems & risks) with a full-width Value Proposition band, gray section cards with confidence badges, evidence/TODO styling, and in-browser mermaid rendering. The `acc-canvas-html` subagent fills this template **faithfully** from the Markdown - it is a renderer, never an analyst, and adds no facts. The fill rules and Markdown -> HTML mapping live in the template's top comment. Output defaults to `docs/architecture-communication-canvas.html`.
+### Markdown template
+
+The Markdown document follows [assets/template.md](assets/template.md) exactly. It is based on the arc42 ACC Markdown/Mermaid template and renders with the VSCode "Markdown Preview Enhanced" extension or on GitHub. The template:
+- Lists all nine sections **flat**, in the canonical canvas order (Value Proposition, Core Functions, Key Stakeholder, Quality Requirements, Business Context, Core Decisions, Technologies, Components / Modules, Core Risks and Missing Information), with `##` emoji headings - no three-area `##` group headers.
+- Keeps the evidence-or-gap conventions above: a `Confidence:` line per section, `(evidence: ...)` / `(source: ...)` tags, `Inferred:` markers, and `> TODO (human input needed): ...` placeholders.
+- Includes a short header line (`*System: ... | Created by: ... | Created for: ... | Date / Iteration: ... | Repository: ...*`) and the "shortest possible description" tagline.
+- Ends with a "Provenance" note (which sections used user input vs. repo evidence) and the arc42 / CC BY-SA attribution.
+
+### HTML overview
+
+A one-page, canvas-styled HTML overview generated from the Markdown using [assets/canvas-template.html](assets/canvas-template.html). It lays out the three areas as columns (Requirements / Solution / Problems & risks) with a full-width Value Proposition band, gray section cards with confidence badges, evidence/TODO styling, and in-browser mermaid rendering. The `acc-canvas-html` subagent fills this template **faithfully** from the Markdown - it is a renderer, never an analyst, and adds no facts. The fill rules and Markdown -> HTML mapping live in the template's top comment. Output defaults to `docs/architecture-communication-canvas.html`.
+
+### draw.io canvas
+
+An editable draw.io diagram generated from the Markdown using [assets/canvas-template.drawio](assets/canvas-template.drawio) (the arc42 `acc-with-fa-icons` canvas layout: one box per category, plus System / Created by / Created for / Date header fields). The `acc-canvas-drawio` subagent fills each category box's text **faithfully** from the Markdown (keeping each box's title, replacing its prompt questions with the filled content, preserving evidence tags and TODOs) and fills the header fields. It is a renderer, never an analyst. Because draw.io cannot render Mermaid, the Business Context and Components / Modules diagrams are rendered as faithful text bullets (edges/dependencies) inside their boxes. draw.io does not clip overflowing text, so the renderer sizes content to each box - being concise for the fixed-grid boxes and, only for the bottom full-width Risks box, enlarging it and shifting the footer/background down when needed (see the `acc-canvas-drawio` agent's "Fitting content to the boxes"). Output defaults to `docs/architecture-communication-canvas.drawio` and opens in draw.io or the VSCode Draw.io Integration extension.
 
 ## Assembly rules (orchestrator)
 

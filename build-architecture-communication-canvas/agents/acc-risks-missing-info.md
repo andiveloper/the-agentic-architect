@@ -23,7 +23,7 @@ The orchestrator passes `mode: gap-scan` or `mode: fill` (and, for fill, user in
 Return the gap-scan fragment per `acc-gap-analysis`. Risks are largely derivable; note operational/organizational risks may need human input. If `docs/commit-analysis.md` is absent, note in "Missing" that running `/analyze-commits` would strengthen this section (the orchestrator decides whether to offer it).
 
 ### fill
-Produce the **Risks and Missing Information** section body per `arc42-acc-canvas` conventions (Confidence line, evidence tags, `Inferred:`, TODO placeholders). Structure as a `#### Risks` list (with evidence) followed by a `#### Missing information` list. If the orchestrator passed `docs/commit-analysis.md` (contents or path), incorporate its evidenced risks first, cited `(source: docs/commit-analysis.md)`. If it passed unresolved gaps from other categories, fold them (de-duplicated) into "Missing information". Return only the section body, no heading.
+Produce the **Risks and Missing Information** section body per `arc42-acc-canvas` conventions (Confidence line, evidence tags, `Inferred:`, TODO placeholders). Structure as a `### Risks` list (with evidence) followed by a `### Missing information` list. If the orchestrator passed `docs/commit-analysis.md` (contents or path), incorporate its evidenced risks first, cited `(source: docs/commit-analysis.md)`. If it passed unresolved gaps from other categories, fold them (de-duplicated) into "Missing information". Return only the section body, no heading.
 
 ## Rules
 Read-only. No assumptions. Report only evidenced risks; mark suspected-but-unconfirmed ones as `Inferred:`. Return only your fragment.

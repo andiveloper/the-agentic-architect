@@ -16,9 +16,12 @@ You coordinate; the nine category subagents do the analysis in their own context
 
 Each accepts a `mode` (`gap-scan` or `fill`) in its prompt. Launch them with the Task tool. Launch all nine in a single message (parallel) each phase.
 
-## The HTML renderer subagent
+## The renderer subagents
 
-`acc-canvas-html` - a faithful renderer (not an analyst) that turns the finished Markdown canvas into a one-page, canvas-styled HTML overview by filling the `arc42-acc-canvas` skill's `assets/canvas-template.html`. It runs once, after the Markdown is written.
+Two faithful renderers (not analysts) turn the finished Markdown canvas into visual artifacts. Each runs once, after the Markdown is written, and adds no facts:
+
+- `acc-canvas-html` - fills the `arc42-acc-canvas` skill's `assets/canvas-template.html` to produce a one-page, canvas-styled HTML overview (`docs/architecture-communication-canvas.html`).
+- `acc-canvas-drawio` - fills the `arc42-acc-canvas` skill's `assets/canvas-template.drawio` to produce an editable draw.io canvas (`docs/architecture-communication-canvas.drawio`).
 
 ## Workflow
 
@@ -32,6 +35,7 @@ Copy this checklist and track progress:
 - [ ] Phase 3: fill all 9 categories (parallel) with collected inputs (pass commit-analysis to the Risks subagent)
 - [ ] Assemble and write docs/architecture-communication-canvas.md (merge if updating)
 - [ ] Render docs/architecture-communication-canvas.html via the acc-canvas-html subagent
+- [ ] Render docs/architecture-communication-canvas.drawio via the acc-canvas-drawio subagent
 - [ ] Summarize unresolved TODOs (and what changed, if updating) to the user
 ```
 
@@ -76,13 +80,14 @@ This tool is re-runnable. Before anything else, check whether `docs/architecture
    - **Update run:** reconcile with the existing file instead of overwriting blindly. Preserve human-authored content and answered TODOs; update sections whose evidence changed; add newly discovered items; and where a previous finding no longer has supporting evidence, mark it stale/removed rather than silently deleting it. Refresh the generation date and keep the document concise. Only fall back to a full overwrite (after confirming with the user) if the existing file cannot be cleanly merged.
 4. Report a short summary: confidence per area and the list of unresolved `TODO (human input needed)` items for the user to complete. On an update run, also summarize what changed since the previous version (sections updated, items added, items marked stale).
 
-### Render the HTML overview
+### Render the HTML overview and the draw.io canvas
 
-After the Markdown is written, launch the `acc-canvas-html` subagent once (Task tool) to produce a visual one-page overview:
+After the Markdown is written, launch both renderer subagents (Task tool) to produce the visual artifacts. They are independent faithful renderers, so launch them in a single message (parallel):
 
-1. Pass it the path to the finished Markdown (`docs/architecture-communication-canvas.md`), the template path (`arc42-acc-canvas` skill `assets/canvas-template.html`), and the output path `docs/architecture-communication-canvas.html`.
-2. It fills the template faithfully from the Markdown (no new facts) and renders the mermaid diagrams in-browser. On an update run it re-renders from the refreshed Markdown, overwriting the previous HTML.
-3. Mention the generated `docs/architecture-communication-canvas.html` in your summary so the user can open it.
+1. `acc-canvas-html`: pass the path to the finished Markdown (`docs/architecture-communication-canvas.md`), the template path (`arc42-acc-canvas` skill `assets/canvas-template.html`), and the output path `docs/architecture-communication-canvas.html`. It fills the template faithfully (no new facts) and renders the mermaid diagrams in-browser.
+2. `acc-canvas-drawio`: pass the same Markdown path, the template path (`arc42-acc-canvas` skill `assets/canvas-template.drawio`), and the output path `docs/architecture-communication-canvas.drawio`. It fills each category box and the header fields faithfully from the Markdown (no new facts).
+3. On an update run both re-render from the refreshed Markdown, overwriting the previous artifacts.
+4. Mention the generated `docs/architecture-communication-canvas.html` and `docs/architecture-communication-canvas.drawio` in your summary so the user can open them.
 
 ## Rules
 

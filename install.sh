@@ -187,7 +187,7 @@ install_into() {
   echo "    - define-bounded-contexts, ddd-bounded-contexts"
   echo "    - analyze-commits, git-history-diagnostics"
   echo "  Subagents: $dest/agents/"
-  echo "    - 9 acc-* category agents + acc-canvas-html (HTML overview renderer)"
+  echo "    - 9 acc-* category agents + acc-canvas-html (HTML renderer) + acc-canvas-drawio (draw.io renderer)"
   echo "    - ul-domain-extractor"
   echo "    - bc-context-analyzer"
   echo "    - 5 commit-* diagnostic agents (churn, contributors, bug-cluster, velocity, firefighting)"

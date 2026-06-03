@@ -19,9 +19,9 @@ The Agentic Architect attacks both: because the documentation is **generated fro
 
 **Goal:** capture "the shortest possible description of your architecture" by filling out the [arc42 Architecture Communication Canvas (ACC)](https://canvas.arc42.org/architecture-communication-canvas) for any repository.
 
-Nine category subagents scan the codebase, report what's derivable versus missing, let you fill the gaps, then assemble a single evidence-backed canvas with all nine ACC sections. The result lands in `docs/architecture-communication-canvas.md`.
+Nine category subagents scan the codebase, report what's derivable versus missing, let you fill the gaps, then assemble a single evidence-backed canvas with all nine ACC sections. The result lands in `docs/architecture-communication-canvas.md` (Markdown/Mermaid), and is rendered into two more views from the same content: a one-page `docs/architecture-communication-canvas.html` overview and an editable `docs/architecture-communication-canvas.drawio` canvas (the original arc42 ACC layout).
 
-Sample output: [Markdown](build-architecture-communication-canvas/example-architecture-communication-canvas.md) · [HTML](build-architecture-communication-canvas/example-architecture-communication-canvas.html)
+Sample output: [Markdown](build-architecture-communication-canvas/example-architecture-communication-canvas.md) · [HTML](build-architecture-communication-canvas/example-architecture-communication-canvas.html) · [draw.io](build-architecture-communication-canvas/example-architecture-communication-canvas.drawio)
 
 [![Architecture Communication Canvas - HTML overview for the sample Taskflow API](build-architecture-communication-canvas/example-architecture-communication-canvas.png)](build-architecture-communication-canvas/example-architecture-communication-canvas.png)
 
@@ -124,7 +124,7 @@ where `<base>` is `$HOME` (`--user`) or your `--target` directory. Run `./instal
 1. Open the repository you want to document in your coding agent (Cursor or Claude Code).
 2. Run the slash command for the tool you want:
    - `/analyze-commits` → `docs/commit-analysis.md`
-   - `/build-architecture-communication-canvas` → `docs/architecture-communication-canvas.md`
+   - `/build-architecture-communication-canvas` → `docs/architecture-communication-canvas.md` (+ `.html` overview and `.drawio` canvas)
    - `/discover-ubiquitous-language` → `docs/ubiquitous-language.md`
    - `/define-bounded-contexts` → `docs/bounded-contexts.md` + one canvas per context under `docs/bounded-contexts/`
 3. Answer the gap report inline (add docs or answer questions, or skip).
@@ -140,15 +140,17 @@ The toolkit is agent-neutral: each tool lives in a single top-level folder, and 
 build-architecture-communication-canvas/         # the ACC tool
   skills/
     build-architecture-communication-canvas/      # orchestrator entrypoint
-    arc42-acc-canvas/                              # canvas template (md + html) + conventions
+    arc42-acc-canvas/                              # canvas templates (md + html + drawio) + conventions
     repo-discovery/                                # black-box discovery heuristics
     acc-gap-analysis/                              # inputs catalog + question bank
   agents/
     acc-value-proposition.md ... acc-risks-missing-info.md   # 9 category subagents
     acc-canvas-html.md                             # renders the HTML overview from the Markdown
-  example-architecture-communication-canvas.md    # sample output (Markdown)
-  example-architecture-communication-canvas.html  # sample output (HTML)
-  example-architecture-communication-canvas.png   # sample output (HTML rendered to PNG)
+    acc-canvas-drawio.md                           # renders the draw.io canvas from the Markdown
+  example-architecture-communication-canvas.md     # sample output (Markdown/Mermaid)
+  example-architecture-communication-canvas.html   # sample output (HTML overview)
+  example-architecture-communication-canvas.drawio # sample output (draw.io canvas)
+  example-architecture-communication-canvas.png    # sample output (HTML rendered to PNG)
 discover-ubiquitous-language/                     # the DDD ubiquitous-language tool
   skills/
     discover-ubiquitous-language/                  # orchestrator entrypoint
@@ -176,7 +178,7 @@ install.sh
 
 ## License
 
-[MIT](LICENSE)
+[Apache License 2.0](LICENSE)
 
 ## Credits
 

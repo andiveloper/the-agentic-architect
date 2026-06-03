@@ -18,12 +18,12 @@ Read the `arc42-acc-canvas` skill if its conventions are not already in context.
 ## Steps
 1. Read the Markdown canvas and the HTML template in full. The template's top comment block defines the exact fill rules and the Markdown -> HTML mapping - follow it precisely.
 2. Map each Markdown region to its template slot:
-   - Header fields (system name, repository, generation date, generated-by) -> the `.title` and `.meta` fields. Leave a value empty if the Markdown does not state it; never invent.
-   - The `>` tagline under the header -> the Value Proposition `.tagline`.
-   - Each `### <Section>` body -> the `<article>`/`<section>` whose `data-section` matches (value-proposition, key-stakeholder, core-functions, quality-requirements, business-context, components-modules, core-decisions, technologies, risks-missing-info).
+   - Header fields (system name, repository, generation date, generated-by) -> the `.title` and `.meta` fields. The Markdown header is a single line `*System: ... | Created by: ... | Created for: ... | Date / Iteration: ... | Repository: ...*` plus the `# Architecture Communication Canvas - <System Name>` title; pull each field from there. Leave a value empty if the Markdown does not state it; never invent.
+   - The `>` tagline under the header -> the header `.tagline` (in the `.title-block`).
+   - Each `## <Section>` body (sections use `##` emoji headings, e.g. `## Value Proposition 💼`; ignore the emoji when matching) -> the `<article class="card">` whose `data-section` matches (value-proposition, key-stakeholder, core-functions, quality-requirements, business-context, components-modules, core-decisions, technologies, risks-missing-info). Value Proposition is a normal card in the top-left of the four-column body (not a band). The Markdown lists sections flat (no three-area group headers); the HTML template fixes each section's position in the arc42 box layout, so place each section in its matching card regardless of Markdown order.
    - `## Provenance` -> the footer `.provenance` list.
 3. Within each section body, convert Markdown to HTML using the template's mapping:
-   - bullets -> `<ul><li>`; `#### Sub` -> `<h3>`; paragraphs -> `<p>`.
+   - bullets -> `<ul><li>`; `### Sub` (e.g. `### Risks`, `### Missing information`) -> `<h3>`; paragraphs -> `<p>`.
    - ` ```mermaid ... ``` ` -> `<pre class="mermaid">` with the diagram code copied **verbatim** (do not edit node IDs, labels, or layout).
    - `> TODO (human input needed): ...` -> `<p class="todo">...</p>`.
    - Wrap each `(evidence: ...)` / `(source: ...)` tag in `<span class="evidence">`.
