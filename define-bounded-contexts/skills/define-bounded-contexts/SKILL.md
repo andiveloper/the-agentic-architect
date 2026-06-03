@@ -100,6 +100,7 @@ This tool is re-runnable. Check whether the index `docs/bounded-contexts.md` and
 
 - Black-box: never assume language, framework, or layout (see `repo-discovery`).
 - Boundaries follow the model and the language, not folder names alone.
+- Pitch it for an architect bridging business and development - not too technical, not too abstract. Concrete enough that developers recognize the system (key aggregate, defining event, owned data store, real integration seam - verbatim), but framed in business language a stakeholder can follow. Don't drift to a code inventory (never enumerate individual functions, methods, files, endpoints, or columns - capture only the few that characterize each context and summarize the rest), nor to vague abstractions the team can't act on. Keep Purpose and rationale to 1-2 short sentences; the evidence tag is a provenance pointer only. When in doubt, summarize and omit rather than list.
 - Always produce a context map, not just a list of contexts.
 - Evidence-or-gap: every context and relationship cites a real artifact; unknowns become `> TODO (human input needed)` placeholders, never guessed.
 - If both optional inputs are missing, never silently skip - ask, and record the user's choice in the output.

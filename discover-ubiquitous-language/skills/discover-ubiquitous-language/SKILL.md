@@ -75,6 +75,7 @@ This tool is re-runnable. Before anything else, check whether `docs/ubiquitous-l
 
 - Black-box: never assume language, framework, or layout (see `repo-discovery`).
 - Mirror the code; keep terms verbatim. Never invent or rename terms.
-- Focus on the most important terms; do not pad the glossary. Surface notable variants/synonyms as discussion points, not extra rows.
+- Pitch it for an architect bridging business and development - not too technical, not too abstract. Capture domain **concepts** both sides recognize (terms verbatim, but explained in plain domain language). Don't enumerate functions, methods, files, or modules (too technical), and don't pad with vague abstractions that point at nothing concrete. The evidence tag is a provenance pointer only.
+- Focus on the most important terms; do not pad the glossary. When in doubt, summarize and omit rather than list. Surface notable variants/synonyms as discussion points, not extra rows.
 - Evidence-or-gap: every term cites a real artifact; unknowns become `> TODO (human input needed): ...` placeholders, never guessed.
 - Keep the document concise and table-first, readable by non-technical domain experts.
