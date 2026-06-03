@@ -64,11 +64,12 @@ So generated diagrams render:
 
 ## Outputs
 
-The tool produces three artifacts from the same content, all under `docs/`:
+The tool produces four artifacts from the same content, all under `docs/`:
 
-1. **Markdown / Mermaid** (`docs/architecture-communication-canvas.md`) - the canonical, human-editable source. The renderable HTML and draw.io artifacts are derived from it.
+1. **Markdown / Mermaid** (`docs/architecture-communication-canvas.md`) - the canonical, human-editable source. The HTML, draw.io, and PNG artifacts are derived from it.
 2. **HTML overview** (`docs/architecture-communication-canvas.html`) - a one-page, canvas-styled visual overview.
 3. **draw.io canvas** (`docs/architecture-communication-canvas.drawio`) - an editable diagram on the original arc42 ACC canvas layout.
+4. **PNG snapshot** (`docs/architecture-communication-canvas.png`) - a full-page image of the HTML overview (optional; requires headless Chrome).
 
 ### Markdown template
 
@@ -85,6 +86,10 @@ A one-page, canvas-styled HTML overview generated from the Markdown using [asset
 ### draw.io canvas
 
 An editable draw.io diagram generated from the Markdown using [assets/canvas-template.drawio](assets/canvas-template.drawio) (the arc42 `acc-with-fa-icons` canvas layout: one box per category, plus System / Created by / Created for / Date header fields). The `acc-canvas-drawio` subagent fills each category box's text **faithfully** from the Markdown (keeping each box's title, replacing its prompt questions with the filled content, preserving evidence tags and TODOs) and fills the header fields. It is a renderer, never an analyst. Because draw.io cannot render Mermaid, the Business Context and Components / Modules diagrams are rendered as faithful text bullets (edges/dependencies) inside their boxes. draw.io does not clip overflowing text, so the renderer sizes content to each box - being concise for the fixed-grid boxes and, only for the bottom full-width Risks box, enlarging it and shifting the footer/background down when needed (see the `acc-canvas-drawio` agent's "Fitting content to the boxes"). Output defaults to `docs/architecture-communication-canvas.drawio` and opens in draw.io or the VSCode Draw.io Integration extension.
+
+### PNG snapshot
+
+A full-page PNG of the HTML overview, produced by the `acc-canvas-png` skill's `assets/html-to-png.py` using headless Chrome. It measures the full rendered page and captures beyond the viewport so the whole canvas is included (no cutoff), after waiting for the mermaid diagrams to render. Optional: if Chrome/Chromium is unavailable the step is skipped (the other three artifacts are unaffected). Output defaults to `docs/architecture-communication-canvas.png`.
 
 ## Assembly rules (orchestrator)
 

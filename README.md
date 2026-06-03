@@ -19,7 +19,7 @@ The Agentic Architect attacks both: because the documentation is **generated fro
 
 **Goal:** capture "the shortest possible description of your architecture" by filling out the [arc42 Architecture Communication Canvas (ACC)](https://canvas.arc42.org/architecture-communication-canvas) for any repository.
 
-Nine category subagents scan the codebase, report what's derivable versus missing, let you fill the gaps, then assemble a single evidence-backed canvas with all nine ACC sections. The result lands in `docs/architecture-communication-canvas.md` (Markdown/Mermaid), and is rendered into two more views from the same content: a one-page `docs/architecture-communication-canvas.html` overview and an editable `docs/architecture-communication-canvas.drawio` canvas (the original arc42 ACC layout).
+Nine category subagents scan the codebase, report what's derivable versus missing, let you fill the gaps, then assemble a single evidence-backed canvas with all nine ACC sections. The result lands in `docs/architecture-communication-canvas.md` (Markdown/Mermaid), and is rendered into three more views from the same content: a one-page `docs/architecture-communication-canvas.html` overview, an editable `docs/architecture-communication-canvas.drawio` canvas (the original arc42 ACC layout), and a full-page `docs/architecture-communication-canvas.png` snapshot of the HTML (via headless Chrome).
 
 Sample output: [Markdown](build-architecture-communication-canvas/example-architecture-communication-canvas.md) · [HTML](build-architecture-communication-canvas/example-architecture-communication-canvas.html) · [draw.io](build-architecture-communication-canvas/example-architecture-communication-canvas.drawio)
 
@@ -141,6 +141,7 @@ build-architecture-communication-canvas/         # the ACC tool
   skills/
     build-architecture-communication-canvas/      # orchestrator entrypoint
     arc42-acc-canvas/                              # canvas templates (md + html + drawio) + conventions
+    acc-canvas-png/                                # HTML -> full-page PNG via headless Chrome (script)
     repo-discovery/                                # black-box discovery heuristics
     acc-gap-analysis/                              # inputs catalog + question bank
   agents/

@@ -36,6 +36,7 @@ Copy this checklist and track progress:
 - [ ] Assemble and write docs/architecture-communication-canvas.md (merge if updating)
 - [ ] Render docs/architecture-communication-canvas.html via the acc-canvas-html subagent
 - [ ] Render docs/architecture-communication-canvas.drawio via the acc-canvas-drawio subagent
+- [ ] Render docs/architecture-communication-canvas.png from the HTML via the acc-canvas-png skill (optional; skip if Chrome unavailable)
 - [ ] Summarize unresolved TODOs (and what changed, if updating) to the user
 ```
 
@@ -87,7 +88,8 @@ After the Markdown is written, launch both renderer subagents (Task tool) to pro
 1. `acc-canvas-html`: pass the path to the finished Markdown (`docs/architecture-communication-canvas.md`), the template path (`arc42-acc-canvas` skill `assets/canvas-template.html`), and the output path `docs/architecture-communication-canvas.html`. It fills the template faithfully (no new facts) and renders the mermaid diagrams in-browser.
 2. `acc-canvas-drawio`: pass the same Markdown path, the template path (`arc42-acc-canvas` skill `assets/canvas-template.drawio`), and the output path `docs/architecture-communication-canvas.drawio`. It fills each category box and the header fields faithfully from the Markdown (no new facts).
 3. On an update run both re-render from the refreshed Markdown, overwriting the previous artifacts.
-4. Mention the generated `docs/architecture-communication-canvas.html` and `docs/architecture-communication-canvas.drawio` in your summary so the user can open them.
+4. After the HTML exists, produce a full-page PNG snapshot of it by following the `acc-canvas-png` skill: run its `assets/html-to-png.py` with `--html docs/architecture-communication-canvas.html --out docs/architecture-communication-canvas.png`. It captures the whole page (no cutoff) via headless Chrome. This step is **optional**: if Chrome/Chromium is not available the script exits with code 2 - note that the PNG was skipped and continue (the Markdown, HTML and draw.io are the primary outputs).
+5. Mention the generated `docs/architecture-communication-canvas.html`, `docs/architecture-communication-canvas.drawio`, and (if produced) `docs/architecture-communication-canvas.png` in your summary so the user can open them.
 
 ## Rules
 

@@ -182,7 +182,7 @@ install_into() {
     copy_tree "$SRC_BASE/$tk/agents" "$dest/agents"
   done
   echo "  Skills:    $dest/skills/"
-  echo "    - build-architecture-communication-canvas, arc42-acc-canvas, repo-discovery, acc-gap-analysis"
+  echo "    - build-architecture-communication-canvas, arc42-acc-canvas, acc-canvas-png, repo-discovery, acc-gap-analysis"
   echo "    - discover-ubiquitous-language, ddd-ubiquitous-language"
   echo "    - define-bounded-contexts, ddd-bounded-contexts"
   echo "    - analyze-commits, git-history-diagnostics"
