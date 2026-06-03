@@ -36,5 +36,5 @@ Read the `arc42-acc-canvas` skill if its conventions are not already in context.
 ## Rules
 - Do not change the template's structure, classes, CSS, or the Mermaid `<script>`. Only fill content and the `data-confidence` attributes.
 - Faithful rendering only: no new facts, no summarizing away TODOs or evidence tags, no reordering of sections.
-- Keep Mermaid blocks exactly as written so they render; if a diagram is missing in the Markdown, omit the `<pre class="mermaid">` rather than inventing one.
+- Keep Mermaid blocks exactly as written so they render; if a diagram is missing in the Markdown, omit the `<pre class="mermaid">` rather than inventing one. The diagrams are kept high-level upstream (in the Markdown, per the `arc42-acc-canvas` "Level of abstraction" rule); render them verbatim and do not add or expand detail here.
 - Write the result to the output path and report it back, noting any sections that were empty or any header fields left blank.

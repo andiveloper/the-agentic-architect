@@ -28,8 +28,38 @@
         <mxCell id="nuWSFdIdFaRTsBgPpTsw-8" value="&lt;div style=&quot;font-size: 26px&quot;&gt;&lt;b&gt;Quality Requirements&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;Confidence:&lt;/b&gt; medium&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Reliability: retry-with-backoff on execution &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: src/scheduler/retry.ts)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Performance: Redis cache; load test &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: src/cache/, tests/load/)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Security: JWT auth + input validation &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: src/middleware/)&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: #b8860b;&quot;&gt;TODO (human input needed): concrete targets (p99 latency, SLO).&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=5;fillColor=#ffffff;fontSize=12;fontColor=#2F5B7C;align=left;verticalAlign=top;spacing=30;container=0;" parent="1" vertex="1">
           <mxGeometry x="-1678" y="612" width="500" height="240" as="geometry" />
         </mxCell>
-        <mxCell id="nuWSFdIdFaRTsBgPpTsw-9" value="&lt;div style=&quot;font-size: 26px&quot;&gt;&lt;b&gt;Business Context&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;Confidence:&lt;/b&gt; high&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;i&gt;Context diagram (neighbours &amp; data direction):&lt;/i&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; PostgreSQL ↔ Taskflow API - primary datastore &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: docker-compose.yml, src/db/)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Redis ↔ Taskflow API - cache and queue broker &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: docker-compose.yml, src/cache/redis.ts)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Taskflow API → Stripe - billing &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: src/integrations/stripe.ts)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Taskflow API → Customer webhook endpoints - outbound &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: src/webhooks/)&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: #b8860b;&quot;&gt;TODO (human input needed): which neighbours are most business-critical or costly?&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=5;fillColor=#ffffff;fontSize=12;fontColor=#2F5B7C;align=left;verticalAlign=top;spacing=30;container=0;" parent="1" vertex="1">
+        <mxCell id="nuWSFdIdFaRTsBgPpTsw-9" value="&lt;div style=&quot;font-size: 26px&quot;&gt;&lt;b&gt;Business Context&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=5;fillColor=#ffffff;fontSize=12;fontColor=#2F5B7C;align=left;verticalAlign=top;spacing=30;container=0;" parent="1" vertex="1">
           <mxGeometry x="-2188" y="862" width="1010" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-system" value="Taskflow API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8edf0;strokeColor=#2F5B7C;fontColor=#2F5B7C;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="-1763" y="1030" width="160" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-postgres" value="PostgreSQL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8edf0;strokeColor=#2F5B7C;fontColor=#2F5B7C;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="-2160" y="965" width="150" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-redis" value="Redis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8edf0;strokeColor=#2F5B7C;fontColor=#2F5B7C;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="-2160" y="1095" width="150" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-stripe" value="Stripe" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8edf0;strokeColor=#2F5B7C;fontColor=#2F5B7C;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="-1390" y="965" width="170" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-webhooks" value="Customer webhook endpoints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8edf0;strokeColor=#2F5B7C;fontColor=#2F5B7C;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="-1390" y="1095" width="170" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-edge-postgres" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2F5B7C;startArrow=block;endArrow=block;" parent="1" source="bc-postgres" target="bc-system" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-edge-redis" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2F5B7C;startArrow=block;endArrow=block;" parent="1" source="bc-redis" target="bc-system" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-edge-stripe" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2F5B7C;endArrow=block;" parent="1" source="bc-system" target="bc-stripe" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-edge-webhooks" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2F5B7C;endArrow=block;" parent="1" source="bc-system" target="bc-webhooks" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-legend" value="Arrows show data direction (↔ bidirectional). Full evidence in the Markdown / HTML canvas." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=9;fontColor=#6b7177;" parent="1" vertex="1">
+          <mxGeometry x="-2168" y="1188" width="970" height="20" as="geometry" />
         </mxCell>
         <mxCell id="nuWSFdIdFaRTsBgPpTsw-10" value="&lt;div style=&quot;font-size: 26px&quot;&gt;&lt;b&gt;Technologies&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;Confidence:&lt;/b&gt; high&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Languages: TypeScript / Node.js &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: package.json, tsconfig.json, .nvmrc)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Frameworks: Express, BullMQ, Zod &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: package.json)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Data: PostgreSQL, Redis &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: docker-compose.yml)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Infra / CI (Continuous Integration): Docker, GitHub Actions &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: Dockerfile, .github/workflows/ci.yml)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; Observability: pino logging &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: src/logger.ts)&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: #b8860b;&quot;&gt;TODO (human input needed): hosting and monitoring stack not described.&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=5;fillColor=#ffffff;fontSize=12;fontColor=#2F5B7C;align=left;verticalAlign=top;spacing=30;container=0;" parent="1" vertex="1">
           <mxGeometry x="-648" y="242" width="500" height="610" as="geometry" />
@@ -37,8 +67,41 @@
         <mxCell id="nuWSFdIdFaRTsBgPpTsw-11" value="&lt;div style=&quot;font-size: 26px&quot;&gt;&lt;b&gt;Core Decisions - Good or Bad&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;Confidence:&lt;/b&gt; low&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; ADR-0001 (Architecture Decision Record): Redis as both cache and queue &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: docs/adr/0001-redis-as-queue.md)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Inferred:&lt;/b&gt; monorepo with a single deployable service &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: single package.json)&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: #b8860b;&quot;&gt;TODO (human input needed): which decisions are you proud of vs. regret? No verdicts recorded.&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=5;fillColor=#ffffff;fontSize=12;fontColor=#2F5B7C;align=left;verticalAlign=top;spacing=30;container=0;" parent="1" vertex="1">
           <mxGeometry x="-1158" y="242" width="500" height="610" as="geometry" />
         </mxCell>
-        <mxCell id="nuWSFdIdFaRTsBgPpTsw-12" value="&lt;div style=&quot;font-size: 26px&quot;&gt;&lt;b&gt;Components / Modules&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;Confidence:&lt;/b&gt; high&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;i&gt;Component diagram (dependencies):&lt;/i&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; api → scheduler, db&lt;/div&gt;&lt;div&gt;&amp;bull; scheduler → webhooks, cache, db&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; api - HTTP routing and request handling &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: src/routes/)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; scheduler - cron parsing, execution, retries &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: src/scheduler/)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; webhooks - outbound delivery &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: src/webhooks/)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; db - persistence layer; cache - Redis access &lt;span style=&quot;font-size: 9px; color: #6b7177;&quot;&gt;(evidence: src/db/, src/cache/)&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=5;fillColor=#ffffff;fontSize=12;fontColor=#2F5B7C;align=left;verticalAlign=top;spacing=30;container=0;" parent="1" vertex="1">
+        <mxCell id="nuWSFdIdFaRTsBgPpTsw-12" value="&lt;div style=&quot;font-size: 26px&quot;&gt;&lt;b&gt;Components / Modules&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeColor=none;strokeWidth=5;fillColor=#ffffff;fontSize=12;fontColor=#2F5B7C;align=left;verticalAlign=top;spacing=30;container=0;" parent="1" vertex="1">
           <mxGeometry x="-1158" y="862" width="1010" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-api" value="api" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8edf0;strokeColor=#2F5B7C;fontColor=#2F5B7C;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="-728" y="945" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-scheduler" value="scheduler" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8edf0;strokeColor=#2F5B7C;fontColor=#2F5B7C;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="-728" y="1035" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-webhooks" value="webhooks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8edf0;strokeColor=#2F5B7C;fontColor=#2F5B7C;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="-1118" y="1125" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-db" value="db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8edf0;strokeColor=#2F5B7C;fontColor=#2F5B7C;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="-728" y="1125" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-cache" value="cache" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8edf0;strokeColor=#2F5B7C;fontColor=#2F5B7C;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="-338" y="1125" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-edge-api-scheduler" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2F5B7C;endArrow=block;" parent="1" source="cm-api" target="cm-scheduler" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-edge-api-db" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2F5B7C;endArrow=block;" parent="1" source="cm-api" target="cm-db" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-edge-scheduler-webhooks" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2F5B7C;endArrow=block;" parent="1" source="cm-scheduler" target="cm-webhooks" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-edge-scheduler-cache" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2F5B7C;endArrow=block;" parent="1" source="cm-scheduler" target="cm-cache" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-edge-scheduler-db" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2F5B7C;endArrow=block;" parent="1" source="cm-scheduler" target="cm-db" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cm-legend" value="Arrows show 'depends on / calls'. Full evidence in the Markdown / HTML canvas." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=9;fontColor=#6b7177;" parent="1" vertex="1">
+          <mxGeometry x="-1138" y="1188" width="970" height="20" as="geometry" />
         </mxCell>
         <mxCell id="nuWSFdIdFaRTsBgPpTsw-19" value="&lt;font style=&quot;font-size: 28px;&quot;&gt;https://canvas.arc42.org&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=42;fontColor=#2f5c7c;fontStyle=1;fontFamily=Helvetica;container=0;" parent="1" vertex="1">
           <mxGeometry x="-488" y="1597.0" width="340" height="50" as="geometry" />

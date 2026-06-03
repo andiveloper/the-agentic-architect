@@ -40,12 +40,25 @@ Every category section MUST follow these conventions so the document is trustwor
 3. **Confidence label.** Begin each section body with a confidence line: `Confidence: high | medium | low` reflecting how much rests on direct evidence versus inference.
 4. **Inference marker.** Statements that are reasoned rather than directly evidenced are prefixed with `Inferred:` and still carry an evidence tag for the signals they were inferred from.
 
+## Level of abstraction (high-level only)
+
+The ACC is "the shortest possible description" - so **every** section (text and diagrams alike, produced by every subagent) stays high-level and must not get lost in the details:
+
+1. **Few, most-important facts.** Capture only the handful of top-level, evidence-backed points that matter for understanding the architecture - not an exhaustive inventory.
+2. **No fine-grained detail.** Never list function/method names, individual file paths, config keys, or per-module internals. Cite such artifacts only inside `(evidence: ...)` tags, never as the content itself.
+3. **Summarize and group.** Collapse closely-related items into one coarse statement (e.g. "several third-party SDK clients" rather than naming each; one building block rather than its submodules/files).
+4. **Top-level building blocks and context only.** Describe the system, its neighbours, and its major building blocks - the level a newcomer needs first, not the implementation.
+
+This applies to all nine categories. When in doubt, prefer fewer, higher-level statements.
+
 ## Diagrams (prefer over prose)
 
 Two sections are inherently structural and MUST lead with a mermaid diagram, followed by tight evidence bullets (diagram nodes cannot carry `(evidence: ...)` tags, so evidence lives in the bullets beneath):
 
 - **Business Context** - a context diagram: the system as one central node, each neighbouring system / external interface / actor as a node, edges showing direction (an inbound source points *into* the system; an outbound sink is pointed *to* by the system).
 - **Components / Modules** - a component diagram: each major building block a node, dependencies/calls as edges.
+
+Diagrams follow the same **high-level** rule (see "Level of abstraction"): show only top-level context / top-level building blocks, aim for roughly <=7 nodes, and summarize/group closely-related items into one coarse node rather than drawing every detail (never invent nodes/edges that lack evidence). Node labels are short top-level names - no function/method names, file paths, or internal detail.
 
 Every other section stays concise: prefer tight bullet lists over prose, and a diagram over a list wherever it communicates better.
 
@@ -85,7 +98,7 @@ A one-page, canvas-styled HTML overview generated from the Markdown using [asset
 
 ### draw.io canvas
 
-An editable draw.io diagram generated from the Markdown using [assets/canvas-template.drawio](assets/canvas-template.drawio) (the arc42 `acc-with-fa-icons` canvas layout: one box per category, plus System / Created by / Created for / Date header fields). The `acc-canvas-drawio` subagent fills each category box's text **faithfully** from the Markdown (keeping each box's title, replacing its prompt questions with the filled content, preserving evidence tags and TODOs) and fills the header fields. It is a renderer, never an analyst. Because draw.io cannot render Mermaid, the Business Context and Components / Modules diagrams are rendered as faithful text bullets (edges/dependencies) inside their boxes. draw.io does not clip overflowing text, so the renderer sizes content to each box - being concise for the fixed-grid boxes and, only for the bottom full-width Risks box, enlarging it and shifting the footer/background down when needed (see the `acc-canvas-drawio` agent's "Fitting content to the boxes"). Output defaults to `docs/architecture-communication-canvas.drawio` and opens in draw.io or the VSCode Draw.io Integration extension.
+An editable draw.io diagram generated from the Markdown using [assets/canvas-template.drawio](assets/canvas-template.drawio) (the arc42 `acc-with-fa-icons` canvas layout: one box per category, plus System / Created by / Created for / Date header fields). The `acc-canvas-drawio` subagent fills each category box's text **faithfully** from the Markdown (keeping each box's title, replacing its prompt questions with the filled content, preserving evidence tags and TODOs) and fills the header fields. It is a renderer, never an analyst. The Business Context and Components / Modules diagrams are rendered as **native draw.io shapes and connectors** (one node per Mermaid node, one edge per Mermaid edge) placed inside their boxes, with a short evidence/legend line beneath; the full evidence bullets remain in the Markdown and HTML artifacts. draw.io does not clip overflowing text, so the renderer sizes content to each box - being concise for the fixed-grid boxes and, only for the bottom full-width Risks box, enlarging it and shifting the footer/background down when needed (see the `acc-canvas-drawio` agent's "Fitting content to the boxes"). Output defaults to `docs/architecture-communication-canvas.drawio` and opens in draw.io or the VSCode Draw.io Integration extension.
 
 ### PNG snapshot
 
