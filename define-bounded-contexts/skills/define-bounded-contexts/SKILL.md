@@ -1,6 +1,6 @@
 ---
 name: define-bounded-contexts
-description: Orchestrates discovery of Domain-Driven Design bounded contexts and the context map for the current repository, producing one filled-out Bounded Context Canvas (ddd-crew) per context. Detects optional ACC and ubiquitous-language inputs, discovers candidate contexts, analyzes each via parallel subagents, then writes one canvas per context under docs/bounded-contexts/ plus an index (docs/bounded-contexts.md) with the context map and discussion points. Invoke explicitly as /define-bounded-contexts.
+description: Orchestrates discovery of Domain-Driven Design bounded contexts and the context map for the current repository, producing one filled-out Bounded Context Canvas (ddd-crew) per context. Detects optional ACC and ubiquitous-language inputs, discovers candidate contexts, analyzes each via parallel subagents, then renders an editable draw.io canvas per context plus a draw.io context map as the default (and only automatic) outputs under docs/bounded-contexts/. Markdown (per-context canvases + the index), HTML, and PNG are offered as optional outputs at the end and produced only on request. Invoke explicitly as /define-bounded-contexts.
 disable-model-invocation: true
 ---
 
@@ -18,6 +18,8 @@ Identify the real boundaries in the system - where one model/language ends and a
 
 You coordinate; the per-context `bc-context-analyzer` subagents do the analysis in their own context windows. Read the `ddd-bounded-contexts` skill for the boundary signals, relationship patterns, and the Bounded Context Canvas format/templates, and the `repo-discovery` skill for black-box scanning. Keep your own context lean: pass instructions to subagents and consume only their compact fragments.
 
+**draw.io is the single source of truth; it is the default (only automatic) output.** This tool assembles each context's canvas content from the analyzers purely as scaffolding to fill the **draw.io** artifacts: one editable Bounded Context Canvas `.drawio` per context (`docs/bounded-contexts/<context>.drawio`, the canonical per-context artifact) plus one `.drawio` **context map** of the relationships (`docs/bounded-contexts/context-map.drawio`). The assembled content is held in context and passed inline to the renderer; **no Markdown file is written by default and the content is not persisted anywhere except the draw.io**. After the draw.io artifacts are produced, you offer the other formats - **Markdown** (the per-context canvases and the `docs/bounded-contexts.md` index with the context map + discussion points), **HTML** overviews, and **PNG** snapshots - as optional outputs and produce each only if the user asks. Never create them automatically. Each optional per-context format is a **derived view regenerated from that context's `.drawio`** (Markdown and HTML read the `.drawio`; PNG reads the HTML) by its own dedicated renderer - one renderer per format.
+
 ## Optional inputs improve quality
 
 Two artifacts produced by sibling tools, if present, sharpen the analysis far beyond what code structure alone allows:
@@ -30,7 +32,9 @@ Two artifacts produced by sibling tools, if present, sharpen the analysis far be
 ## The subagents
 
 - `bc-context-analyzer` - a **readonly** per-context analyzer, spawned once per candidate bounded context (scoped to that context's paths) to produce its filled canvas fragment. Launch them with the Task tool, all in a single message (parallel).
-- `bc-canvas-html-renderer` - a **write-capable** per-context renderer, spawned once per context during the write step to turn that context's markdown canvas into an HTML overview by filling the HTML template. Launch one per context, in parallel.
+- `bc-canvas-drawio-renderer` - the **default**, source-of-truth per-context renderer, write-capable. Spawned once per context to build that context's canonical draw.io canvas by **copying** the `ddd-bounded-contexts` skill's `assets/canvas-template.drawio` and filling its cells from the assembled content (passed inline). Launch one per context, in parallel.
+- `bc-canvas-markdown-renderer` - an **optional**, derived per-context renderer, write-capable. Spawned once per context only when the user requests Markdown, to recover that context's content from its `.drawio` (per `ddd-bounded-contexts` "Reading the draw.io source of truth") and fill `assets/canvas-template.md`. Launch one per context, in parallel.
+- `bc-canvas-html-renderer` - an **optional**, derived per-context renderer, write-capable. Spawned once per context only when the user requests the HTML (or PNG) output, to recover that context's content from its `.drawio` and fill the HTML template. Launch one per context, in parallel.
 
 ## Workflow
 
@@ -42,10 +46,14 @@ Copy this checklist and track progress:
 - [ ] Discover candidate bounded contexts (repo-discovery + available inputs)
 - [ ] Analyze each context: one bc-context-analyzer per candidate (parallel), each returning a filled canvas
 - [ ] Merge contexts; classify relationships into a context map
-- [ ] Write one canvas per context to docs/bounded-contexts/<context>.md (merge if updating)
-- [ ] Render an HTML overview per canvas to docs/bounded-contexts/<context>.html (subagent fills the HTML template from the markdown)
-- [ ] Assemble and write the index docs/bounded-contexts.md (context map + discussion points; merge if updating)
+- [ ] Assemble each context's canvas content in context (merge if updating) - scaffolding only; do NOT persist it except in the draw.io
+- [ ] Render one draw.io canvas per context to docs/bounded-contexts/<context>.drawio via the bc-canvas-drawio-renderer subagent (DEFAULT, the source of truth) - pass the assembled content inline, in parallel
+- [ ] Render the context map to docs/bounded-contexts/context-map.drawio (DEFAULT) - native nodes/edges built from the relationships
 - [ ] Summarize context count, relationships, and discussion points / TODOs (and what changed, if updating)
+- [ ] Offer the optional derived outputs (Markdown, HTML, PNG) and produce only the ones the user asks for, each regenerated from the .drawio:
+  - [ ] (optional) Render docs/bounded-contexts/<context>.md per context from its .drawio via the bc-canvas-markdown-renderer subagent + assemble the index docs/bounded-contexts.md
+  - [ ] (optional) Render docs/bounded-contexts/<context>.html per context from its .drawio via the bc-canvas-html-renderer subagent
+  - [ ] (optional) Render docs/bounded-contexts/<context>.png per context from the HTML via the acc-canvas-png skill (needs HTML; skip if Chrome unavailable)
 ```
 
 ### Step 0 - Detect optional inputs and decide
@@ -59,14 +67,14 @@ Copy this checklist and track progress:
 
 ### Step 0b - Detect existing outputs (initial vs update run)
 
-This tool is re-runnable. Check whether the index `docs/bounded-contexts.md` and/or any `docs/bounded-contexts/<context>.md` canvases already exist.
+This tool is re-runnable. Check whether any bounded-context outputs already exist under `docs/bounded-contexts/` - the default `<context>.drawio` canvases and `context-map.drawio`, or `<context>.md`/`<context>.html` and the `docs/bounded-contexts.md` index from a prior run.
 
 - **None exist** - this is an **initial run**. Proceed normally.
-- **Some exist** - this is an **update run**. Read the existing index and canvases first and treat them as the base to refine, not replace:
+- **Some exist** - this is an **update run**. Read the existing canvases first (prefer any Markdown if present, else extract the content from the `.drawio` canvases) and treat them as the base to refine, not replace:
   - Carry forward human-authored content: answered `TODO (human input needed)` items, hand-written notes, manually corrected boundaries/relationships, and edited prose.
   - When discovering candidates (step 1), reuse the existing context names/slugs so refreshed canvases land on the same files; only add, split, merge, or retire contexts where the current evidence warrants it (and note why).
   - When analyzing (step 2), pass each `bc-context-analyzer` the matching existing canvas so it refreshes rather than regenerates blind.
-  - **The current skill is authoritative, including its structure.** The existing outputs may have been generated by an older version of this skill / the `bc-context-analyzer` / the templates (e.g. different canvas fields, single-file vs per-context-file layout, different index/context-map format, more prose vs more diagrams, different evidence/TODO conventions). Do not preserve the old shape: conform the outputs to the **current** `ddd-bounded-contexts` templates (`assets/canvas-template.md`, `assets/template.md`) and conventions, and migrate the preserved human content into the new structure - including consolidating an old single-file output into per-context files (or vice-versa) if the current layout differs. Mention in your summary any human content that no longer has a home.
+  - **The current skill is authoritative, including its structure.** The existing outputs may have been generated by an older version of this skill / the `bc-context-analyzer` / the templates (e.g. different canvas fields, single-file vs per-context-file layout, a Markdown-first default vs the current draw.io-default, different index/context-map format, more prose vs more diagrams, different evidence/TODO conventions). Do not preserve the old shape: conform the outputs to the **current** `ddd-bounded-contexts` templates (the default `assets/canvas-template.drawio` per context and the `context-map.drawio`; `assets/canvas-template.md` and `assets/template.md` only for the optional Markdown) and conventions, and migrate the preserved human content into the new structure - including consolidating an old single-file output into per-context files (or vice-versa) if the current layout differs. Mention in your summary any human content that no longer has a home.
 
 ### 1 - Discover candidate bounded contexts
 
@@ -85,16 +93,28 @@ This tool is re-runnable. Check whether the index `docs/bounded-contexts.md` and
 2. From each context's integration points, classify the relationships between contexts using the patterns in `ddd-bounded-contexts` (Partnership, Shared Kernel, Customer/Supplier, Conformist, Anti-Corruption Layer, Open Host Service, Published Language, Separate Ways). Mark direction (upstream/downstream) where evident.
 3. Compile **discussion points**: ambiguous boundaries, contexts that may need splitting or merging, the same term spanning contexts, and undetermined relationships.
 
-### Assemble and write
+### Assemble the canvas content (in context - scaffolding for the draw.io)
 
-1. Load both templates from the `ddd-bounded-contexts` skill: `assets/canvas-template.md` (one per context) and `assets/template.md` (the index).
-2. For **each context**, fill `assets/canvas-template.md` from that context's canvas fragment (purpose, strategic classification, domain roles, inbound/outbound communication, ubiquitous language, business decisions, assumptions, verification metrics, open questions, owned data) and write it to `docs/bounded-contexts/<context-slug>.md`. Slug the filename from the context name (lowercase, hyphenated). Preserve every evidence tag and TODO placeholder.
-   - **HTML overview (one per canvas):** also render each canvas as a single-page HTML overview laid out like the ddd-crew Bounded Context Canvas, written to `docs/bounded-contexts/<context-slug>.html`. Do **not** write a parser/script - the markdown shape varies by run and model. Instead, for each context launch a `bc-canvas-html-renderer` subagent (one per context, in parallel) and pass it three paths: the just-written **markdown** `docs/bounded-contexts/<context-slug>.md`, the **template** `ddd-bounded-contexts/assets/canvas-template.html`, and the **output** `docs/bounded-contexts/<context-slug>.html`. It transcribes the markdown into the template's cells verbatim (keeping terms, every `(evidence: ...)` tag, and every `> TODO (human input needed)` line - never inventing or summarising away content), strips the template's instruction comments, and writes the HTML. (`bc-canvas-html-renderer` is write-capable; do not use the readonly `bc-context-analyzer` for this.)
-3. Fill the index `assets/template.md`: purpose framing line (including the "derived from code only" note if applicable), the contexts table linking to each `bounded-contexts/<context-slug>.md` canvas, the relationships / context-map section with its **required** mermaid diagram (built from each canvas's inbound/outbound communication and the trailing relationships blocks; follow the mermaid guardrail in `ddd-bounded-contexts`), and Discussion points / possible gaps. Write it to `docs/bounded-contexts.md`. Keep prose concise - prefer the diagram and tables over paragraphs.
-4. Create the `docs/` and `docs/bounded-contexts/` directories if needed.
-   - **Initial run:** write each canvas, its HTML overview, and the index.
-   - **Update run:** reconcile with the existing files instead of overwriting blindly. Per canvas, preserve human-authored content and answered TODOs, refresh fields whose evidence changed, and add newly discovered items; for a context that no longer has supporting evidence, mark it retired in the index rather than silently deleting its file (ask the user before deleting any canvas file). Rebuild the index's contexts table and context-map mermaid diagram from the current set. Re-render each refreshed canvas's HTML overview from its updated markdown. Only fall back to a full overwrite (after confirming with the user) if a file cannot be cleanly merged.
-5. Report a short summary: number of contexts (and their canvas files), the relationships in the map, and the discussion points / unresolved TODOs to take to the team. On an update run, also summarize what changed (contexts added/split/merged/retired, relationships changed, items added or marked stale).
+1. For **each context**, assemble its canvas content from that context's analyzer fragment following the `assets/canvas-template.md` shape (purpose, strategic classification, domain roles, inbound/outbound communication, ubiquitous language, business decisions, assumptions, verification metrics, open questions, owned data). Hold it **in context** only as scaffolding to fill that context's draw.io. Preserve every evidence tag and TODO placeholder. Slug each context name (lowercase, hyphenated) for its filenames. **Do not persist the content as a Markdown file** - each `<context>.drawio` is the source of truth; Markdown is an optional derived output (see "Report and offer optional outputs").
+2. Keep the context map and discussion points in context too (built in step 3): the relationships between contexts (with patterns and direction) and the discussion points / possible gaps.
+
+### Render the draw.io canvases and context map (default, only automatic outputs)
+
+After the content is assembled, produce the default draw.io artifacts. Create `docs/bounded-contexts/` if needed.
+
+1. **One canvas per context (parallel).** For each context, launch a `bc-canvas-drawio-renderer` subagent and pass it: the assembled canvas content for that context **inline** (so no Markdown file is needed), the template path (`ddd-bounded-contexts` skill `assets/canvas-template.drawio`), and the output path `docs/bounded-contexts/<context-slug>.drawio`. It copies the template and fills its cells faithfully (no new facts). Launch all contexts in a single parallel message. (`bc-canvas-drawio-renderer` is write-capable; do not use the readonly `bc-context-analyzer` for this.)
+2. **The context map (one file).** Render the relationships as an editable draw.io diagram at `docs/bounded-contexts/context-map.drawio`: one rounded node per context and one edge per relationship, the pattern as the edge label, the arrow pointing upstream -> downstream. Build it as native draw.io shapes/edges (this small diagram has no fixed template, so generate it directly as valid `<mxfile>` XML). Add a short title and a one-line legend expanding any pattern abbreviation used as an edge label (e.g. `OHS = Open Host Service`, `ACL = Anti-Corruption Layer`) and the direction convention. Use the canvas palette (node `style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1C1C1C;fontColor=#1C1C1C;"`, edge `style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1C1C1C;endArrow=block;"`). A flat/tiny repo with a single context still gets a one-node map.
+3. On an update run both re-render from the refreshed content, overwriting the previous `.drawio` artifacts.
+4. Mention the generated `docs/bounded-contexts/<context>.drawio` files and `docs/bounded-contexts/context-map.drawio` in your summary so the user can open them (in draw.io or the VSCode Draw.io Integration extension).
+
+### Report and offer optional outputs
+
+1. Report a short summary: number of contexts (and their `.drawio` canvas files), the relationships in the context map, and the discussion points / unresolved TODOs to take to the team. On an update run, also summarize what changed (contexts added/split/merged/retired, relationships changed, items added or marked stale).
+2. **Optional outputs (Markdown, HTML, PNG) - derived from the draw.io, on request only.** Offer the other formats and produce **only** the ones the user explicitly asks for. Never create them automatically. Each per-context format is regenerated **from that context's `.drawio` source of truth** by its own renderer (so they always match the canonical canvas, even after hand-edits). Use the AskQuestion tool (or a short prompt) to offer: Markdown, HTML overviews, PNG snapshots, or none.
+   - **Markdown** (`docs/bounded-contexts/<context>.md` + index `docs/bounded-contexts.md`): for each context, launch a `bc-canvas-markdown-renderer` subagent (one per context, in parallel) and pass it the source-of-truth path `docs/bounded-contexts/<context>.drawio`, the template path (`ddd-bounded-contexts` skill `assets/canvas-template.md`), and the output path; it recovers the content from the `.drawio` (per "Reading the draw.io source of truth"), copies the template, and fills it in place. Then assemble the index by copying `assets/template.md`: purpose framing line (including the "derived from code only" note if applicable), the contexts table linking to each `bounded-contexts/<context-slug>.md`, the relationships / context-map section with its **required** mermaid diagram (follow the mermaid guardrail in `ddd-bounded-contexts`; you can reuse the relationships you built for `context-map.drawio`), and Discussion points / possible gaps. On an update run, reconcile with the existing Markdown per the merge rules rather than overwriting blindly.
+   - **HTML overviews** (`docs/bounded-contexts/<context>.html` per context): for each context, launch a `bc-canvas-html-renderer` subagent (one per context, in parallel) and pass it the source-of-truth path `docs/bounded-contexts/<context>.drawio`, the template path (`ddd-bounded-contexts` skill `assets/canvas-template.html`), and the output path. It recovers the content from the `.drawio`, copies the template, and fills its cells faithfully.
+   - **PNG snapshots** (`docs/bounded-contexts/<context>.png` per context): require the HTML, so produce the HTML first. Then for each context follow the `acc-canvas-png` skill (it is ecosystem-agnostic and renders any self-contained HTML): run its `assets/html-to-png.py` with `--html docs/bounded-contexts/<context>.html --out docs/bounded-contexts/<context>.png`. If Chrome/Chromium is unavailable the script exits with code 2 - note that the PNG was skipped and continue.
+   Mention any optional artifacts you produced in your summary so the user can open them.
 
 ## Rules
 

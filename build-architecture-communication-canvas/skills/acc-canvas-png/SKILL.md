@@ -33,7 +33,7 @@ On success it prints the measured page size and the output path. It serves the H
 
 ## Behaviour and failure handling
 - **Full page, no cutoff:** the capture height equals the page's full content height, so the header, all nine sections, both Mermaid diagrams, and the footer are always included.
-- **Chrome missing:** the script exits with code `2` and a message telling the user to install Chrome or set `CHROME`. Treat the PNG as optional - the Markdown, HTML, and draw.io artifacts are the primary outputs; report that the PNG was skipped rather than failing the whole run.
+- **Chrome missing:** the script exits with code `2` and a message telling the user to install Chrome or set `CHROME`. The PNG is itself an optional, on-request output (the draw.io canvas is the default output); report that the PNG was skipped rather than failing the whole run.
 - **Other failure:** exit code `1`. Report it, but do not block on it.
 
 ## Notes

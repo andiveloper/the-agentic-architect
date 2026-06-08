@@ -187,9 +187,9 @@ install_into() {
   echo "    - define-bounded-contexts, ddd-bounded-contexts"
   echo "    - analyze-commits, git-history-diagnostics"
   echo "  Subagents: $dest/agents/"
-  echo "    - 9 acc-* category agents + acc-canvas-html (HTML renderer) + acc-canvas-drawio (draw.io renderer)"
+  echo "    - 9 acc-* category agents + acc-canvas-drawio (source of truth, default) + acc-canvas-markdown + acc-canvas-html renderers"
   echo "    - ul-domain-extractor"
-  echo "    - bc-context-analyzer"
+  echo "    - bc-context-analyzer + bc-canvas-drawio-renderer (source of truth, default) + bc-canvas-markdown-renderer + bc-canvas-html-renderer"
   echo "    - 5 commit-* diagnostic agents (churn, contributors, bug-cluster, velocity, firefighting)"
 }
 
@@ -208,9 +208,9 @@ echo "  /build-architecture-communication-canvas   Fill the arc42 Architecture C
 echo "                                             (-> docs/architecture-communication-canvas.md)"
 echo "  /discover-ubiquitous-language              Discover the domain ubiquitous language from existing code for"
 echo "                                             review with domain experts (-> docs/ubiquitous-language.md)"
-echo "  /define-bounded-contexts                   Identify DDD bounded contexts and fill a Bounded Context Canvas"
-echo "                                             per context, plus a context map (-> docs/bounded-contexts/<context>.md"
-echo "                                             + docs/bounded-contexts.md index)"
+echo "  /define-bounded-contexts                   Identify DDD bounded contexts and render a Bounded Context Canvas"
+echo "                                             draw.io per context, plus a draw.io context map (-> docs/bounded-contexts/"
+echo "                                             <context>.drawio + context-map.drawio; md/html/png optional)"
 echo
 echo "Tools stand alone but compose; for a fresh or inherited repo, run them top-to-bottom."
 echo "Open a repository in your coding agent and run one of the commands above."

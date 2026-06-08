@@ -19,7 +19,7 @@ The Agentic Architect attacks both: because the documentation is **generated fro
 
 **Goal:** capture "the shortest possible description of your architecture" by filling out the [arc42 Architecture Communication Canvas (ACC)](https://canvas.arc42.org/architecture-communication-canvas) for any repository.
 
-Nine category subagents scan the codebase, report what's derivable versus missing, let you fill the gaps, then assemble a single evidence-backed canvas with all nine ACC sections. The result lands in `docs/architecture-communication-canvas.md` (Markdown/Mermaid), and is rendered into three more views from the same content: a one-page `docs/architecture-communication-canvas.html` overview, an editable `docs/architecture-communication-canvas.drawio` canvas (the original arc42 ACC layout), and a full-page `docs/architecture-communication-canvas.png` snapshot of the HTML (via headless Chrome).
+Nine category subagents scan the codebase, report what's derivable versus missing, let you fill the gaps, then assemble a single evidence-backed canvas with all nine ACC sections. **By default only the draw.io canvas is generated** - an editable `docs/architecture-communication-canvas.drawio` (the original arc42 ACC layout), which is the **single source of truth**. The other formats are optional and can be generated **afterwards**, on request, each regenerated from the draw.io by its own renderer: a `docs/architecture-communication-canvas.md` (Markdown/Mermaid), a one-page `docs/architecture-communication-canvas.html` overview, and a full-page `docs/architecture-communication-canvas.png` snapshot **rendered from the HTML** (via headless Chrome).
 
 Sample output: [Markdown](build-architecture-communication-canvas/example-architecture-communication-canvas.md) · [HTML](build-architecture-communication-canvas/example-architecture-communication-canvas.html) · [draw.io](build-architecture-communication-canvas/example-architecture-communication-canvas.drawio)
 
@@ -37,7 +37,7 @@ Sample output: [Markdown](discover-ubiquitous-language/example-ubiquitous-langua
 
 **Goal:** identify the [Domain-Driven Design bounded contexts](https://martinfowler.com/bliki/BoundedContext.html) and the **context map** (how those contexts relate), and fill out a [Bounded Context Canvas](https://github.com/ddd-crew/bounded-context-canvas) for each one.
 
-It scans the code black-box and, where available, folds in the outputs of the two tools above to draw boundaries from product vision and domain language, not just folder structure. When neither input exists it asks whether to run those tools first or proceed code-only (lower quality). The result is one canvas per context under `docs/bounded-contexts/` plus an index `docs/bounded-contexts.md` with the context map and its classic relationship patterns (Customer/Supplier, ACL, Open Host Service, ...).
+It scans the code black-box and, where available, folds in the outputs of the two tools above to draw boundaries from product vision and domain language, not just folder structure. When neither input exists it asks whether to run those tools first or proceed code-only (lower quality). **By default only draw.io is generated**: one editable Bounded Context Canvas (V5 layout) per context under `docs/bounded-contexts/<context>.drawio` - each the **single source of truth** for that context - plus a `docs/bounded-contexts/context-map.drawio` of the relationships and their classic patterns (Customer/Supplier, ACL, Open Host Service, ...). The other formats are optional and can be generated **afterwards**, on request, each regenerated from the per-context draw.io by its own renderer: Markdown (per-context canvases + a `docs/bounded-contexts.md` index), HTML overviews, and PNG snapshots **rendered from the HTML**.
 
 Sample output: index [Markdown](define-bounded-contexts/example-bounded-contexts.md) · per-context canvas [Markdown](define-bounded-contexts/example-bounded-contexts/sales.md) · [HTML](define-bounded-contexts/example-bounded-contexts/sales.html) (also [billing](define-bounded-contexts/example-bounded-contexts/billing.html), [delivery](define-bounded-contexts/example-bounded-contexts/delivery.html), [identity](define-bounded-contexts/example-bounded-contexts/identity.html))
 
@@ -75,7 +75,7 @@ flowchart LR
     cmd["/slash-command"] --> p1["Phase 1: Gap analysis (readonly subagents)"]
     p1 --> p2["Phase 2: You add docs / answer questions"]
     p2 --> p3["Phase 3: Autonomous fill"]
-    p3 --> out["docs/<output>.md"]
+    p3 --> out["docs/<output> (draw.io for the canvas tools, .md for the others)"]
 ```
 
 ### Why subagents + skills?
@@ -124,9 +124,9 @@ where `<base>` is `$HOME` (`--user`) or your `--target` directory. Run `./instal
 1. Open the repository you want to document in your coding agent (Cursor or Claude Code).
 2. Run the slash command for the tool you want:
    - `/analyze-commits` → `docs/commit-analysis.md`
-   - `/build-architecture-communication-canvas` → `docs/architecture-communication-canvas.md` (+ `.html` overview and `.drawio` canvas)
+   - `/build-architecture-communication-canvas` → `docs/architecture-communication-canvas.drawio` (default; `.md`, `.html`, `.png` optional on request)
    - `/discover-ubiquitous-language` → `docs/ubiquitous-language.md`
-   - `/define-bounded-contexts` → `docs/bounded-contexts.md` + one canvas per context under `docs/bounded-contexts/`
+   - `/define-bounded-contexts` → `docs/bounded-contexts/<context>.drawio` + `docs/bounded-contexts/context-map.drawio` (default; Markdown/HTML/PNG optional on request)
 3. Answer the gap report inline (add docs or answer questions, or skip).
 4. Review the generated file(s) and resolve any `TODO (human input needed)` placeholders.
 
@@ -146,8 +146,9 @@ build-architecture-communication-canvas/         # the ACC tool
     acc-gap-analysis/                              # inputs catalog + question bank
   agents/
     acc-value-proposition.md ... acc-risks-missing-info.md   # 9 category subagents
-    acc-canvas-html.md                             # renders the HTML overview from the Markdown
-    acc-canvas-drawio.md                           # renders the draw.io canvas from the Markdown
+    acc-canvas-drawio.md                           # builds the draw.io canvas (source of truth, default output)
+    acc-canvas-markdown.md                         # derives the Markdown view from the draw.io (optional)
+    acc-canvas-html.md                             # derives the HTML overview from the draw.io (optional)
   example-architecture-communication-canvas.md     # sample output (Markdown/Mermaid)
   example-architecture-communication-canvas.html   # sample output (HTML overview)
   example-architecture-communication-canvas.drawio # sample output (draw.io canvas)
@@ -162,9 +163,12 @@ discover-ubiquitous-language/                     # the DDD ubiquitous-language 
 define-bounded-contexts/                          # the DDD bounded-context + context-map tool
   skills/
     define-bounded-contexts/                       # orchestrator entrypoint
-    ddd-bounded-contexts/                          # boundary signals + relationship patterns + canvas + index templates
+    ddd-bounded-contexts/                          # boundary signals + relationship patterns + canvas templates (drawio + md + html) + index template
   agents/
     bc-context-analyzer.md                         # per-context canvas subagent
+    bc-canvas-drawio-renderer.md                   # builds the draw.io canvas per context (source of truth, default)
+    bc-canvas-markdown-renderer.md                 # derives the Markdown view per context from the draw.io (optional)
+    bc-canvas-html-renderer.md                     # derives the HTML overview per context from the draw.io (optional)
   example-bounded-contexts.md                      # sample index output (Markdown)
   example-bounded-contexts/                        # sample per-context canvases (Markdown + HTML + PNG preview)
 analyze-commits/                                  # the git-history diagnostics tool

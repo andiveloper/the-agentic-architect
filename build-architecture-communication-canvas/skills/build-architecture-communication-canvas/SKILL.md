@@ -1,6 +1,6 @@
 ---
 name: build-architecture-communication-canvas
-description: Orchestrates generation of an arc42 Architecture Communication Canvas for the current repository. Runs gap analysis, collects missing inputs, then fills all nine categories autonomously via per-category subagents and writes a single Markdown file. Invoke explicitly as /build-architecture-communication-canvas.
+description: Orchestrates generation of an arc42 Architecture Communication Canvas for the current repository. Runs gap analysis, collects missing inputs, then fills all nine categories autonomously via per-category subagents and renders an editable draw.io canvas as the default (and only automatic) output. Markdown, HTML, and PNG are offered as optional outputs at the end and produced only on request. Invoke explicitly as /build-architecture-communication-canvas.
 disable-model-invocation: true
 ---
 
@@ -10,18 +10,23 @@ Orchestrates the three-phase generation of an [arc42 Architecture Communication 
 
 You coordinate; the nine category subagents do the analysis in their own context windows. Read the `arc42-acc-canvas` skill for the template, conventions, and assembly rules, and the `acc-gap-analysis` skill for the report/question formats. Keep your own context lean: pass instructions to subagents and consume only their compact fragments.
 
+**draw.io is the single source of truth; it is the default (only automatic) output.** This tool assembles the canvas content from the nine subagents purely as scaffolding to fill the **draw.io canvas** (`docs/architecture-communication-canvas.drawio`) - the canonical, human-editable artifact. The assembled content is held in context and passed inline to the draw.io renderer; **no Markdown file is written by default and the content is not persisted anywhere except the draw.io**. After the draw.io is produced, you offer the three other formats - **Markdown**, **HTML overview**, and **PNG** - as optional outputs and produce each one only if the user asks. Never create them automatically. Each optional format is a **derived view regenerated from the draw.io** (Markdown and HTML read the `.drawio`; PNG reads the HTML) by its own dedicated renderer - one renderer per format.
+
 ## The nine category subagents
 
 `acc-value-proposition`, `acc-key-stakeholder`, `acc-core-functions`, `acc-quality-requirements`, `acc-business-context`, `acc-components-modules`, `acc-core-decisions`, `acc-technologies`, `acc-risks-missing-info`.
 
 Each accepts a `mode` (`gap-scan` or `fill`) in its prompt. Launch them with the Task tool. Launch all nine in a single message (parallel) each phase.
 
-## The renderer subagents
+## The renderer subagents (one per output format)
 
-Two faithful renderers (not analysts) turn the finished Markdown canvas into visual artifacts. Each runs once, after the Markdown is written, and adds no facts:
+Faithful renderers (not analysts) - they add no facts. There is one per format, and the draw.io renderer is the source-of-truth producer; the others derive their format from the draw.io:
 
-- `acc-canvas-html` - fills the `arc42-acc-canvas` skill's `assets/canvas-template.html` to produce a one-page, canvas-styled HTML overview (`docs/architecture-communication-canvas.html`).
-- `acc-canvas-drawio` - fills the `arc42-acc-canvas` skill's `assets/canvas-template.drawio` to produce an editable draw.io canvas (`docs/architecture-communication-canvas.drawio`).
+- `acc-canvas-drawio` - the **default**, source-of-truth renderer. Fills the `arc42-acc-canvas` skill's `assets/canvas-template.drawio` from the assembled content (passed inline) to produce the canonical draw.io canvas (`docs/architecture-communication-canvas.drawio`).
+- `acc-canvas-markdown` - **optional**, derived. Reads the `.drawio` (per `arc42-acc-canvas` "Reading the draw.io source of truth") and fills `assets/template.md` to produce `docs/architecture-communication-canvas.md`. Run only when the user requests Markdown.
+- `acc-canvas-html` - **optional**, derived. Reads the `.drawio` and fills `assets/canvas-template.html` to produce `docs/architecture-communication-canvas.html`. Run only when the user requests the HTML (or PNG) output.
+
+The PNG is produced by the `acc-canvas-png` skill from the HTML (see "Optional outputs").
 
 ## Workflow
 
@@ -33,19 +38,21 @@ Copy this checklist and track progress:
 - [ ] Present report to the user; if commit-analysis is missing, ask upfront whether to run /analyze-commits
 - [ ] Phase 2: collect documents and/or inline answers (or accept skip); run /analyze-commits if the user agreed
 - [ ] Phase 3: fill all 9 categories (parallel) with collected inputs (pass commit-analysis to the Risks subagent)
-- [ ] Assemble and write docs/architecture-communication-canvas.md (merge if updating)
-- [ ] Render docs/architecture-communication-canvas.html via the acc-canvas-html subagent
-- [ ] Render docs/architecture-communication-canvas.drawio via the acc-canvas-drawio subagent
-- [ ] Render docs/architecture-communication-canvas.png from the HTML via the acc-canvas-png skill (optional; skip if Chrome unavailable)
+- [ ] Assemble the canvas content in context (merge if updating) - scaffolding only; do NOT persist it anywhere except the draw.io
+- [ ] Render docs/architecture-communication-canvas.drawio via the acc-canvas-drawio subagent (DEFAULT, the source of truth) - pass the assembled content inline
 - [ ] Summarize unresolved TODOs (and what changed, if updating) to the user
+- [ ] Offer the optional derived outputs (Markdown, HTML, PNG) and produce only the ones the user asks for, each regenerated from the draw.io:
+  - [ ] (optional) Render docs/architecture-communication-canvas.md from the .drawio via the acc-canvas-markdown subagent
+  - [ ] (optional) Render docs/architecture-communication-canvas.html from the .drawio via the acc-canvas-html subagent
+  - [ ] (optional) Render docs/architecture-communication-canvas.png from the HTML via the acc-canvas-png skill (needs HTML; skip if Chrome unavailable)
 ```
 
 ### Step 0 - Detect existing canvas (initial vs update run)
 
-This tool is re-runnable. Before anything else, check whether `docs/architecture-communication-canvas.md` already exists.
+This tool is re-runnable. Before anything else, check whether a canvas already exists under `docs/` - look for any of `docs/architecture-communication-canvas.drawio` (the default output), `docs/architecture-communication-canvas.md`, or `docs/architecture-communication-canvas.html`.
 
-- **It does not exist** - this is an **initial run**. Proceed normally.
-- **It exists** - this is an **update run**. Read the existing canvas first and treat it as the base to refine, not replace:
+- **None exists** - this is an **initial run**. Proceed normally.
+- **One or more exist** - this is an **update run**. Read the existing canvas artifact(s) first (prefer the Markdown if present, else extract the content from the `.drawio`) and treat it as the base to refine, not replace:
   - Carry its human-authored content forward: any `TODO (human input needed)` a human has since answered, hand-written notes, `(source: user input)` lines, and otherwise resolved gaps. These must survive the re-run.
   - In Phase 1, you may skip re-asking for inputs already captured in the existing canvas; only the still-open gaps need fresh attention.
   - In Phase 3, pass each subagent the matching existing section so it **refreshes** that section (correct/extend against current code) rather than regenerating blind.
@@ -72,24 +79,31 @@ This tool is re-runnable. Before anything else, check whether `docs/architecture
 2. For `acc-risks-missing-info`, also pass the de-duplicated list of unresolved `TODO`/gap items surfaced by the other eight subagents so it can populate "Missing information", and - if `docs/commit-analysis.md` exists - pass its path/contents so it can fold the commit-history risks (churn/bug hotspots, bus factor, firefighting, velocity) into the Risks list cited `(source: docs/commit-analysis.md)`.
 3. Do not prompt the user during this phase.
 
-### Assemble and write
+### Assemble the canvas content (in context - scaffolding for the draw.io)
 
-1. Load the template from the `arc42-acc-canvas` skill (`assets/template.md`).
-2. Insert each subagent's fragment under its matching heading, applying the assembly rules from `arc42-acc-canvas` (preserve evidence tags and TODO placeholders; build the Risks "Missing information" union; fill header fields from evidence or mark TODO).
-3. Write the result to `docs/architecture-communication-canvas.md` (create the `docs/` directory if needed).
-   - **Initial run:** write the assembled document.
-   - **Update run:** reconcile with the existing file instead of overwriting blindly. Preserve human-authored content and answered TODOs; update sections whose evidence changed; add newly discovered items; and where a previous finding no longer has supporting evidence, mark it stale/removed rather than silently deleting it. Refresh the generation date and keep the document concise. Only fall back to a full overwrite (after confirming with the user) if the existing file cannot be cleanly merged.
-4. Report a short summary: confidence per area and the list of unresolved `TODO (human input needed)` items for the user to complete. On an update run, also summarize what changed since the previous version (sections updated, items added, items marked stale).
+1. Insert each subagent's fragment under its matching heading, applying the assembly rules from `arc42-acc-canvas` (preserve evidence tags and TODO placeholders; build the Risks "Missing information" union; fill header fields from evidence or mark TODO). Use the `assets/template.md` shape as the mental model for the content.
+2. Hold the assembled content **in context** only as scaffolding to fill the draw.io. **Do not persist it as a file** - the draw.io is the source of truth; the Markdown file is an optional derived output (see "Optional outputs").
+   - **Initial run:** assemble from scratch.
+   - **Update run:** the existing source of truth is the `docs/architecture-communication-canvas.drawio` (recover its content per `arc42-acc-canvas` "Reading the draw.io source of truth"; if only an older `.md`/`.html` exists, read that). Reconcile the assembled content with it instead of regenerating blind. Preserve human-authored content and answered TODOs; update sections whose evidence changed; add newly discovered items; and where a previous finding no longer has supporting evidence, mark it stale/removed rather than silently deleting it. Refresh the generation date and keep the content concise.
+3. Report a short summary: confidence per area and the list of unresolved `TODO (human input needed)` items for the user to complete. On an update run, also summarize what changed since the previous version (sections updated, items added, items marked stale).
 
-### Render the HTML overview and the draw.io canvas
+### Render the draw.io canvas (default; the source of truth)
 
-After the Markdown is written, launch both renderer subagents (Task tool) to produce the visual artifacts. They are independent faithful renderers, so launch them in a single message (parallel):
+After the canvas content is assembled, launch the `acc-canvas-drawio` subagent (Task tool) to produce the canonical artifact:
 
-1. `acc-canvas-html`: pass the path to the finished Markdown (`docs/architecture-communication-canvas.md`), the template path (`arc42-acc-canvas` skill `assets/canvas-template.html`), and the output path `docs/architecture-communication-canvas.html`. It fills the template faithfully (no new facts) and renders the mermaid diagrams in-browser.
-2. `acc-canvas-drawio`: pass the same Markdown path, the template path (`arc42-acc-canvas` skill `assets/canvas-template.drawio`), and the output path `docs/architecture-communication-canvas.drawio`. It fills each category box and the header fields faithfully from the Markdown (no new facts).
-3. On an update run both re-render from the refreshed Markdown, overwriting the previous artifacts.
-4. After the HTML exists, produce a full-page PNG snapshot of it by following the `acc-canvas-png` skill: run its `assets/html-to-png.py` with `--html docs/architecture-communication-canvas.html --out docs/architecture-communication-canvas.png`. It captures the whole page (no cutoff) via headless Chrome. This step is **optional**: if Chrome/Chromium is not available the script exits with code 2 - note that the PNG was skipped and continue (the Markdown, HTML and draw.io are the primary outputs).
-5. Mention the generated `docs/architecture-communication-canvas.html`, `docs/architecture-communication-canvas.drawio`, and (if produced) `docs/architecture-communication-canvas.png` in your summary so the user can open them.
+1. `acc-canvas-drawio`: pass the assembled canvas content **inline** in the prompt, the template path (`arc42-acc-canvas` skill `assets/canvas-template.drawio`), and the output path `docs/architecture-communication-canvas.drawio`. It copies the template and fills each category box and the header fields faithfully from the content (no new facts). Create the `docs/` directory if needed. The `.drawio` must carry the complete content so the other formats can be regenerated from it losslessly.
+2. On an update run it re-renders from the refreshed content, overwriting the previous `.drawio`.
+3. Mention the generated `docs/architecture-communication-canvas.drawio` in your summary so the user can open it (in draw.io or the VSCode Draw.io Integration extension).
+
+### Optional outputs (Markdown, HTML, PNG) - derived from the draw.io, on request only
+
+After reporting the draw.io result, offer the three other formats and produce **only** the ones the user explicitly asks for. Never create them automatically. Each is regenerated **from the `.drawio` source of truth** by its own renderer (so they always match the canonical canvas, even after hand-edits to the `.drawio`). Use the AskQuestion tool (or a short prompt) to offer: Markdown, HTML overview, PNG snapshot, or none.
+
+- **Markdown** (`docs/architecture-communication-canvas.md`): launch `acc-canvas-markdown`, passing the source-of-truth path `docs/architecture-communication-canvas.drawio`, the template path (`arc42-acc-canvas` skill `assets/template.md`), and the output path. It recovers the content from the `.drawio` (per "Reading the draw.io source of truth"), copies the template, and fills it in place.
+- **HTML overview** (`docs/architecture-communication-canvas.html`): launch `acc-canvas-html`, passing the same `.drawio` path, the template path (`arc42-acc-canvas` skill `assets/canvas-template.html`), and the output path. It recovers the content from the `.drawio`, copies the template, and fills it in place (rendering the mermaid diagrams in-browser).
+- **PNG snapshot** (`docs/architecture-communication-canvas.png`): requires the HTML, so produce the HTML first (render it now if the user wants the PNG but not the HTML). Then follow the `acc-canvas-png` skill: run its `assets/html-to-png.py` with `--html docs/architecture-communication-canvas.html --out docs/architecture-communication-canvas.png`. It captures the whole page (no cutoff) via headless Chrome. If Chrome/Chromium is unavailable the script exits with code 2 - note that the PNG was skipped and continue.
+
+Mention any optional artifacts you produced in your summary so the user can open them.
 
 ## Rules
 
