@@ -1,6 +1,6 @@
 # The Agentic Architect
 
-**The Agentic Architect** equips coding agents with reusable guidance for architectural work - so your agent ([Cursor](https://cursor.com/docs) or [Claude Code](https://code.claude.com/docs)) can genuinely assist software and solution architects and development teams, not just write code. It is a growing toolbelt of skills and subagents, each focused on one architecture task, each installable on its own, and each invoked as a single slash command.
+**The Agentic Architect** equips coding agents with reusable guidance for architectural work - so your agent ([Cursor](https://cursor.com/docs) or [Claude Code](https://code.claude.com/docs)) can genuinely assist software and solution architects and development teams, not just write code. It is a growing toolbelt of skills and subagents, each focused on one architecture task, each usable on its own, and each invoked as a single slash command.
 
 Every tool analyzes your repository as a **black box** - no assumptions about language, framework, or layout - and follows an evidence-or-gap rule: every statement cites a real artifact, and anything that can't be derived from the repo is marked as a gap rather than invented.
 
@@ -13,9 +13,19 @@ Architecture documentation has two chronic failure modes:
 
 The Agentic Architect attacks both: because the documentation is **generated from the code itself** by your coding agent, it's cheap to (re)create on demand - re-run a tool whenever the code changes and the artifact catches up. And because every statement is backed by evidence from the repo, you get an accurate starting point for a brand-new or inherited codebase in minutes instead of weeks.
 
-## Tools on the belt
+## Tools on the belt (in the recommended order of execution)
 
-### 1. `/build-architecture-communication-canvas`
+### 1. `/analyze-commits`
+
+**Goal:** diagnose a repository from its **git history before reading any code** - which files to read first, and what to be careful of.
+
+It runs the five diagnostics from Ally Piechowski's [The Git Commands I Run Before Reading Any Code](https://piechowski.io/post/git-commands-before-reading-code/) - code-churn hotspots, contributors and bus factor, bug clusters, project velocity, and firefighting/crisis patterns - cross-references churn against bugs to surface the highest-risk files, and assembles everything into a single Markdown report with a verdict and explicit data caveats. The result lands in `docs/commit-analysis.md`.
+
+This tool is **independent of the others and can be run at any time** - it only needs git history, not the other artifacts. It's **recommended as the first step**, though: it gives you your bearings before you read any code, and `/build-architecture-communication-canvas` consumes its output (when present) to enrich the Risks section. If it hasn't been run, the canvas tool offers to run it upfront during gap analysis.
+
+Sample output: [Markdown](analyze-commits/example-commit-analysis.md)
+
+### 2. `/build-architecture-communication-canvas`
 
 **Goal:** capture "the shortest possible description of your architecture" by filling out the [arc42 Architecture Communication Canvas (ACC)](https://canvas.arc42.org/architecture-communication-canvas) for any repository.
 
@@ -25,7 +35,7 @@ Sample output: [Markdown](build-architecture-communication-canvas/example-archit
 
 [![Architecture Communication Canvas - HTML overview for the sample Taskflow API](build-architecture-communication-canvas/example-architecture-communication-canvas.png)](build-architecture-communication-canvas/example-architecture-communication-canvas.png)
 
-### 2. `/discover-ubiquitous-language`
+### 3. `/discover-ubiquitous-language`
 
 **Goal:** surface the [Domain-Driven Design ubiquitous language](https://martinfowler.com/bliki/UbiquitousLanguage.html) **as it actually appears in the code** - the real domain nouns, verbs, statuses, and events.
 
@@ -33,7 +43,7 @@ It produces a domain-expert review artifact (a rough domain classification, a pl
 
 Sample output: [Markdown](discover-ubiquitous-language/example-ubiquitous-language.md)
 
-### 3. `/define-bounded-contexts`
+### 4. `/define-bounded-contexts`
 
 **Goal:** identify the [Domain-Driven Design bounded contexts](https://martinfowler.com/bliki/BoundedContext.html) and the **context map** (how those contexts relate), and fill out a [Bounded Context Canvas](https://github.com/ddd-crew/bounded-context-canvas) for each one.
 
@@ -42,16 +52,6 @@ It scans the code black-box and, where available, folds in the outputs of the tw
 Sample output: index [Markdown](define-bounded-contexts/example-bounded-contexts.md) · per-context canvas [Markdown](define-bounded-contexts/example-bounded-contexts/sales.md) · [HTML](define-bounded-contexts/example-bounded-contexts/sales.html) (also [billing](define-bounded-contexts/example-bounded-contexts/billing.html), [delivery](define-bounded-contexts/example-bounded-contexts/delivery.html), [identity](define-bounded-contexts/example-bounded-contexts/identity.html))
 
 [![Bounded Context Canvas - Sales (sample HTML overview)](define-bounded-contexts/example-bounded-contexts/sales.png)](define-bounded-contexts/example-bounded-contexts/sales.png)
-
-### 4. `/analyze-commits`
-
-**Goal:** diagnose a repository from its **git history before reading any code** - which files to read first, and what to be careful of.
-
-It runs the five diagnostics from Ally Piechowski's [The Git Commands I Run Before Reading Any Code](https://piechowski.io/post/git-commands-before-reading-code/) - code-churn hotspots, contributors and bus factor, bug clusters, project velocity, and firefighting/crisis patterns - cross-references churn against bugs to surface the highest-risk files, and assembles everything into a single Markdown report with a verdict and explicit data caveats. The result lands in `docs/commit-analysis.md`.
-
-This tool is **independent of the others and can be run at any time** - it only needs git history, not the other artifacts. It's **recommended as the first step**, though: it gives you your bearings before you read any code, and `/build-architecture-communication-canvas` consumes its output (when present) to enrich the Risks section. If it hasn't been run, the canvas tool offers to run it upfront during gap analysis.
-
-Sample output: [Markdown](analyze-commits/example-commit-analysis.md)
 
 More tools (e.g. architecture review) will follow as additional top-level folders.
 

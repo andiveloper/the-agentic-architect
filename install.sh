@@ -56,9 +56,6 @@ Usage:
   ./install.sh --claude --target /path/to/your/project
   ./install.sh --cursor --claude --target /path/to/your/project
   ./install.sh --help
-
-Run directly from GitHub without a checkout:
-  curl -fsSL https://raw.githubusercontent.com/andiveloper/the-agentic-architect/main/install.sh | bash -s -- --cursor --user
 EOF
   exit "${1:-0}"
 }
